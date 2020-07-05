@@ -1,0 +1,244 @@
+%------------- SECTION
+\section{Introduction}
+
+A \red{generative approach} models the conditional PMF/PDF $f(x|y,{\theta})$ of an observation $x$ from the $d$-dimensional vector of \red{features} $X$, given an observation of the \red{class label} $Y=y$; and then applies \red{Bayes rule} to give a classification. 
+
+$Y$ can be modeled as a discrete random variable that follows a 
+\red{categorical distribution} with $K$ distinct classes; this is $ \mathcal{Y}=\supp{Y}=\{c_1,c_2,...,c_K\}$. It has parameter $\delta\in\Delta$ (the simplex of sixe $K-1$), such that $\pr(Y=c_k)=p(c_k|\delta)=\delta_k$. Moreover, $X$ can be modeled as a $d$-dimensional random vector with $\mathcal{X}=\supp X$ and conditional PMF/PDF $f(x|c_k,{\theta}_k)$ given $Y=c_k$, with $\theta\in\Theta$
+
+Parameters $\delta$ and $\theta$ can be modelled as stochastic variables, with respective PDFs being $q(\delta|\alpha)$ and $g(\theta|\beta$), with \red{hyperparameters} $\alpha\in A,\beta\in B$
+
+%------------- SECTION
+\section{Bayes optimal classifier}
+
+Let $L:\mathcal{Y}^2\mapsto\R_+$ be the \red{0-1 loss function}; this is: $L(y_1,y_2) = 1-\I(y_1=y_2),\ \forall y_1,y_2\in\mathcal{Y}$
+
+Let $h:\mathcal{X}\mapsto\mathcal{Y}$ be a {learner}/{classifier}. Its \red{conditional risk} given $X=x$, $R(h|x)$, is defined as the \red{expected loss} under the distribution of $Y|X$:
+\begin{align*}
+    R(h|x) &= \E_{Y|X} L(h(x),Y) = \sum_{y\,\in\mathcal{Y}} L(h({x}),y)\pr(Y=y|X={x}) \\
+    &= 0+\sum_{y\,\in\mathcal{Y}\setminus\{h({x})\} } \pr(Y=y|X={x}) = 1 - \pr(Y=h(x)|X={x})
+\end{align*}
+
+If $\theta$ and $\delta$ were \textbf{deterministic and known}, a \red{Bayes optimal classifier}, $h(x)^*_B$ could be found having the lowest risk; this is equivalent of having largest \red{predictive posterior probability}.
+\begin{align*}
+    h(x)^*_B &\in   \argmax_{y\,\in\mathcal{Y}}\pr(Y=y|X={x}) = \argmax_{y\,\in\mathcal{Y}} \frac{\pr(Y=y)f(x|y,\theta)}{\sum_{k=1}^K \pr(Y=c_k)f(x|c_k,\theta)} \\ &= \argmax_{y\,\in\mathcal{Y}} p(y|\delta)f(x|y,\theta)
+\end{align*}
+
+Because $\theta$ and $\delta$ are typically not known, they should be estimated first using a \red{random sample}.
+
+Let $(y_i,x_i)_{i=1}^n$ be a random sample: an independent and identically distributed $n$ size observation of $(Y,X)$. The \red{empirical risk} of a classifier $h:\mathcal{X}\mapsto\mathcal{Y}$, is defined as:
+\begin{equation*}
+   \widehat{R}(h) = \frac{1}{n} \sum_{i=1}^n L(h({x}_i),y_i) = 1-\frac{1}{n}\sum_{i=1}^{n}\I(h({x}_i)=y_i)
+\end{equation*}
+
+So, a \red{empirical optimal classifier} $\widehat{h}^*$ is such that:
+\begin{equation*}
+    \widehat{h}^* \in 
+    \argmin_{h} \widehat{R}(h) = \argmax_{h}\frac{1}{n}\sum_{i=1}^{n}\I(h(x_i)=y_i)
+\end{equation*}
+
+The empirical optimal classifier gives the lowest number of misclassification cases in the data. By the \red{law of large numbers}, $\frac{1}{n}\sum_{i=1}^{n}\I(\widehat{h}^*({x}_i)=y_i)$ is an unbiased and consistent estimator of $f(Y,X|\theta,\delta)=f(X|Y,\theta)p(Y|\delta)$. This means that finding $\widehat{h}^*$ is equivalent to finding the \red{Maximum Likelihood Estimators} of $\theta$ and $\delta$
+
+A similar analysis can be made when $\theta$ and $\delta$ are \textbf{stochastic}, which derives in finding the \red{Maximum Aposteriori Estimators} of $\theta$ and $\delta$, or computing the \red{posterior predictive distribution} on full Bayesian approach.
+
+
+
+
+
+%------------- SECTION
+\section{Estimation}
+\subsection{Maximum Likelihood}
+In case of $\theta$ and $\delta$ being modeled as \textbf{deterministic}, then by \red{Bayes rule} the full joint distribution can be expressed in terms of the conditional PDF/PMF of $X$ given $Y$: $f(x|y,\theta)$, and the marginal PMF of $Y$: $p(y|\delta)$, such that: 
+$f(y,x|\theta,\delta) = f(x|y,\theta)p(y|\delta)$
+
+Let $D=(y_i,x_i)_{i=1}^n=(\vb{y},\vb{X})$ be a \red{random sample}, then the \red{MLE} of $\theta\in\Theta, \delta\in\Delta$ are:
+\begin{align*}
+    (\hat{\theta},\hat{\delta}) = \argsup_{\theta\in\Theta, \delta\in\Delta}l(\theta,\delta) &= \argsup_{\theta\in\Theta, \delta\in\Delta} \ln\prod_{i=1}^n p(y_i|\delta)f(x_i|y_i,\theta) \\
+    &= \argsup_{\theta\in\Theta, \delta\in\Delta} \left[\sum_{i=1}^n\ln p(y_i|\delta)+\sum_{i=1}^n\ln f(x_i|y_i,\theta)\right] \\
+    &= \argsup_{\theta\in\Theta, \delta\in\Delta} \left[\sum_{i=1}^n\sum_{k=1}^K \I(y_i=c_k)\ln\delta_k+\sum_{i=1}^n\ln f(x_{i}|y_i,\theta)\right]\\
+    &= \argsup_{\theta\in\Theta, \delta\in\Delta} \left[\sum_{k=1}^K n_k\ln\delta_k+\sum_{i=1}^n\ln f(x_{i}|y_i,\theta)\right],\ \text{ where } n_k=\#\{y_i : y_i=c_k\}
+\end{align*}
+
+The maximization process is separable, so we get $\hat{\delta}_{k}=n_k/n$. The solution for $\hat{\theta}$ depends on the distribution assumption of $X|Y$
+
+MLE classifier is then:
+\begin{equation*}
+    \hat{y}=\hat{h}(x_0) \in \argmax_{y\,\in\mathcal{Y}}\left[ \ln p(y|\hat{\delta})+\ln f(x_0|y,\hat{\theta})\right]
+\end{equation*}
+
+\subsection{Maximum Posteriori}
+The trouble with ML is that it can overfit, specially when the estimators lie close or at the boundary of the parameter space. This overfitting can be \red{smoothened} by using a \red{Bayesian prior distributions} on $\delta$ and $\theta$. 
+
+Let $q(\delta|\alpha)$ be the PMF/PDF of $\delta$ and $g(\theta|\beta)$ be the PMF/PDF of $\theta$, with \red{hyperparameters} $\alpha\in A, \beta\in B$. Let $D=(y_i,x_i)_{i=1}^n=(\vb{y},\vb{X})$ be a \red{random sample}, then the \red{MAP} of $\theta\in\Theta, \delta\in\Delta$ are:
+\begin{align*}
+    (\Tilde{\theta}, \Tilde{\delta}) 
+    &= \argsup_{\theta\in\Theta, \delta\in\Delta} \ln\left[g(\theta|\beta)q(\delta|\alpha) \prod_{i=1}^np(y_i|\delta) f(x_i|y_i,\theta) \right]\\
+    &= \argsup_{\theta\in\Theta, \delta\in\Delta} \left[\ln g(\theta|\beta)+\ln q(\delta|\alpha)+\sum_{i=1}^n\ln p(y_i|\delta)+\sum_{i=1}^n\ln f(x_i|y_i,\theta)\right]
+    \\
+    &= \argsup_{\theta\in\Theta, \delta\in\Delta} \left[\ln g(\theta|\beta)+\ln q(\delta|\alpha)+\sum_{k=1}^Kn_k\ln \delta_k+\sum_{i=1}^n\ln f(x_i|y_i,\theta)\right]
+\end{align*}
+
+The maximization process is separable. Also, typically $\delta$ is modeled as having the \red{Dirichlet distribution}; so $q(\delta|\alpha)=B(\alpha)^{-1}\prod_{k=1}^K \delta_k^{\alpha_k-1}$, where $B(\alpha)$ is the \red{multivariate beta function}. When all $\alpha_k=1$, this is called \red{add-one/Laplace smoothing}:
+\begin{align*}
+    \Tilde{\delta}_k &= \frac{n_k+\alpha_k}{n+\sum_{c=1}^K\alpha_c} \\
+    \Tilde{\theta} &= \argsup_{\theta\in\Theta} \left[\ln g(\theta|\beta)+\sum_{i=1}^n\ln f(x_i|y_i,\theta)\right]
+\end{align*}
+
+MAP classifier is based on an approximation named the \red{plug-in approximation}. This is:
+\begin{equation*}
+    \hat{y}=\hat{h}(x_0) \in \argmax_{y\,\in\mathcal{Y}}\left[ \ln p(y|\Tilde{\delta})+\ln f(x_0|y,\Tilde{\theta})\right]
+\end{equation*}
+
+It is based an asymptotic approximation (in some cases exact) of the \red{predictive posterior distribution}:
+\begin{align*}
+   p(y|x,\Tilde{\theta},\Tilde{\delta}) \longrightarrow \pr(Y=y|X=x) &= \int_{\Delta}\int_{\Theta}p(y|x,\theta,\delta)g(\theta|\beta)q(\delta|\alpha)d\theta d\delta\\ &= \int_{\Delta}\int_{\Theta}\frac{f(x|y,\theta)p(y|\delta)}{\sum_{k=1}^K f(x|c_k,\theta)p(c_k|\delta)}g(\theta|\beta)q(\delta|\alpha)d\theta d\delta
+\end{align*}
+
+However, in some cases $p(y|x,\Tilde{\theta},\Tilde{\delta}) $ may not approximate well the predictive posterior distribution, specially in small sample sizes. Also, MAP \textbf{is not invariant to reparametrization}, unline MLE or the full Bayesian approach.
+
+%------------- SECTION
+\section{Naïve Bayes}
+The naïve Bayes approach assumes that features are \red{conditionally independent} given the class label. This means that $f(x_i|y,\theta)=\prod_{j=1}^d\prod_{k=1}^K  f(x_{i,j}|y,\theta_{j,k})^{\I(y=c_k)}$
+
+Then the MLE of $\theta$ can be calculated with:
+\begin{equation*}
+    \hat{\theta}  = \argsup_{\theta\in\Theta'} \sum_{i=1}^n\ln\prod_{j=1}^d f(x_{i,j}|y_i,\theta) = \argsup_{\theta\in\Theta'} \sum_{i=1}^n\sum_{j=1}^d\sum_{k=1}^K\I(y_i=c_k)\ln f(x_{i,j}|y_i,\theta_{j,k})
+\end{equation*}
+
+%------------- subsection
+\subsection{Estimation}
+If all features are Bernoulli random variables, $X_{i,j}|(Y_i=c_k)\overset{iid}{\sim}\text{Ber}(\theta_{j,k})$. Then, the MLE are:
+\begin{equation*}
+    \hat{\theta}_{j,k} = \frac{n_{j,k}}{n_k},\ \text{ where } n_{j,k}=\sum_{i=1}^n\I(y_i=c_k,x_{i,j}=1)
+\end{equation*}
+
+This model is known as \red{bag of words model}, where every $X_{i,j}$ represents the presence or absence of word $j$ in document $j$. It is used to classifier documents. 
+
+However, ML can overfit, specially when $\hat{\theta}_{j,k}=1\ (\text{ or } 0),\ \forall k\in\mathcal{Y},$ and some feature $j$ (\red{black swan paradox}.)
+
+
+\subsection{Prediction}
+The naïve Bayes classifier is based on the predictive posterior probability:
+\begin{align*}
+    \hat{y}=\hat{h}(x) &\in   \argmax_{y\,\in\mathcal{Y}}\hat{\mathbb{P}}(Y=y|X={x})  = \argmax_{y\,\in\mathcal{Y}} f(x|y,\hat{\theta})p(y|\hat{\delta})\\
+    &= \argmax_{y\,\in\mathcal{Y}}p(y|\hat{\delta})\prod_{j=1}^d\prod_{k=1}^K  f(x_{i,j}|y,\hat{\theta}_{j,k})^{\I(y=c_k)}\\
+    &= \argmax_{y\,\in\mathcal{Y}}\left[ \ln p(y|\hat{\delta})+\sum_{k=1}^K\I(y=c_k)\sum_{j=1}^d  \ln f(x_{i,j}|y,\hat{\theta}_{j,k})\right]
+\end{align*}
+
+
+
+
+\clearpage
+Let $L:\mathcal{Y}\times\mathcal{X}\mapsto\R_+$ be the \red{log-loss} defined as $L(y,x) = -\ln f(y,x|\theta),\ \forall y\in\mathcal{Y},\ x\in\mathcal{X}$
+
+
+
+
+
+
+
+
+
+By \red{Bayes rule} the log-loss can be expressed in terms of the conditional PMF of $Y$ given $X$: $p(y|x,\theta_1)$, and the joint PMF/PDF of $X$: $f_X(x|\theta_2)$.
+\begin{equation*}
+    L(y,x) = -\ln p(y|x,\theta_1)-\ln f_X(x|\theta_2),\ \forall y\in\mathcal{Y},\ x\in\mathcal{X}
+\end{equation*}
+
+
+
+
+
+
+
+
+
+
+
+\subsubsection{Predictive posterior distribution}
+
+The conditional PMF $p_{Y|X}(y|x)=\pr(Y=y|\va{x}=\vb{x})$ is called the PMF of the \red{predictive posterior distribution} of $Y$ given $\va{x}=\vb{x}$. Let $p_Y(y)=\pr(Y=y)$ be the PMF of the \red{prior class label distribution} of $Y$, and $f_{X|Y}(x|y)$ be the conditional PDF of the distribution of $X$ given $Y=y$. By \red{Bayes Law}:
+\begin{equation*}
+    p_{Y|X}(y|x)= \frac{f_{X|Y}(x|y)p_Y(y)}{\sum_{k=1}^Kf_{X|Y}(x|c_k)p_Y(c_k)}
+\end{equation*}
+
+\subsubsection{Estimating the parameters of the class distribution}
+
+
+
+Let $Y$ be a discrete random variable that follows a 
+\red{categorical distribution} $Y\sim\textrm{Cat}(\vb{q})$, with $K$ classes: $\mathcal{Y} =\{c_1,c_2,...,c_K\}$, and PMF $p_Y(y|\vb{q})$ parametrized with $\vb{q}\in \Delta^K = \{\vb{d}\in[0,1]^K: \vb{d}\cdot\vb{1}_K=1 \}$. Since $\vb{q}$ is unknown, it can be modeled as having a  \red{symmetric Dirichlet distribution} with PDF $f_q(\vb{q})$: 
+\begin{align*}
+    p_Y(y|\vb{q}) & =\prod_{k=1}^Kq_{k}^{\I(y=c_k)}, \ \forall y\in\{c_1,c_2,...,c_K\},\ \vb{q}\in \Delta^K \\
+    f_q(\vb{q}|\alpha) &= \frac{1}{B(\alpha\vb{1}_K)}\prod_{k=1}^Kq_{k}^{\alpha-1},\ \forall \vb{q}\in \Delta^K,\ \alpha>0
+\end{align*}
+
+Let $(y_i)_{i=1}^I$ be a \red{random sample} of $Y$, and let $c_k=\sum_{i=1}^I\I(y_i=c_k)$ be the count of category $c_k$ in the data. Then the \red{Maximum Likelihood Estimator (MLE)} and the \red{Maximum a Posteriori Estimator (MAP)} of $\vb{q}$ are:
+\begin{align*}
+    \widehat{\vb{q}}_{MLE} &\in\argmax\limits_{\vb{q}\in\Delta^K}\prod_{i=1}^I p_Y(y_i|\vb{q})
+    =\argmax\limits_{\vb{q}\in\Delta^K}\prod_{i=1}^I \prod_{k=1}^Kq_{k}^{\I(y_i=c_k)}
+    =\argmax\limits_{\vb{q}\in\Delta^K} \prod_{k=1}^Kq_{k}^{c_k} \\
+    &=\argmax\limits_{\vb{q}\in\Delta^K}\sum_{k=1}^Kc_k\ln q_{k} \Rightarrow \widehat{q}_k=\frac{c_k}{\sum_{k=1}^Kc_k}=\frac{c_k}{I}
+\end{align*}
+
+\begin{align*}
+    \widehat{\vb{q}}_{MAP} &\in\argmax\limits_{\vb{q}\in\Delta^K}\prod_{i=1}^I p_Y(y_i|\vb{q})f_q(\vb{q}|\alpha)
+    =\argmax\limits_{\vb{q}\in\Delta^K} \prod_{k=1}^Kq_{k}^{c_k}\times \frac{1}{B(\alpha\vb{1}_K)}\prod_{k=1}^Kq_{k}^{\alpha-1} \\
+    &=\argmax\limits_{\vb{q}\in\Delta^K}\sum_{k=1}^K\left(c_k+\alpha-1\right)\ln q_{k} \Rightarrow \widehat{q}_k=\frac{c_k+\alpha-1}{\sum_{k=1}^K(c_k+\alpha-1)}=\frac{c_k+\alpha-1}{I+K(\alpha-1)}
+\end{align*}
+
+
+
+
+\subsubsection{Estimating the parameters of the features distribution}
+
+Let $\va{x}$ be a $J$-dimensional random vector (discrete or continuous) with conditional PDF (PMF) given $Y=y$: $f_X(\vb{x}|\vb*{\theta}_y,y)$, which is parametrized with $\vb*{\theta}_y\in\Theta$. Since this parameter is unknown, it can be modeled as having a distribution with PDF $f_\theta(\theta|y)$\medskip
+
+By \red{Bayes Law}:
+\begin{equation*}
+    f_{\theta|X}(\vb*{\theta}|\vb{x})=\frac{f_{X}(\vb{x}|\vb*{\theta})f_\theta(\vb*{\theta})}{f(\vb{x})}\propto f_{X}(\vb{x}|\vb*{\theta})f_\theta(\vb*{\theta})
+\end{equation*}
+
+$f_{X}(\vb{x}|\vb*{\theta})$ is the \red{likelihood} of $\vb*{\theta}$ given a single data point $\vb{x}$, $f_\theta(\vb*{\theta})$ is the PDF of the \red{prior distribution} of $\vb*{\theta}$, and  $f_{\theta|X}(\vb*{\theta}|\vb{x})$ is the PDF of the \red{posterior distribution} of $\vb*{\theta}$\medskip
+
+Let $(\vb{x}_i)_{i=1}^I$ be a \red{random sample} (independent and identically distributed) of $\va{x}$. Then the \red{Maximum Likelihood Estimator (MLE)} of $\vb*{\theta}$ maximizes the likelihood given the data, and the \red{Maximum a Posteriori Estimator (MAP)} of $\vb*{\theta}$ maximizes the joint posterior probability of the data. This is:
+\begin{align*}
+    \widehat{\vb*{\theta}}_{MLE} &\in\argmax\limits_{\vb*{\theta}\in\Theta}\prod_{i=1}^I f_{X}(\vb{x}_i|\vb*{\theta}) = \argmax\limits_{\vb*{\theta}\in\Theta}\sum_{i=1}^I\ln f_{X}(\vb{x}_i|\vb*{\theta})\\
+    \widehat{\vb*{\theta}}_{MAP} &\in\argmax\limits_{\vb*{\theta}\in\Theta}f_\theta(\vb*{\theta})
+    \prod_{i=1}^I f_{X}(\vb{x}_i|\vb*{\theta}) = \argmax\limits_{\vb*{\theta}\in\Theta}\left(\ln f_\theta(\vb*{\theta})+\sum_{i=1}^I\ln f_{X}(\vb{x}_i|\vb*{\theta})\right)
+\end{align*}
+
+As the likelihood grows exponentially with $I$, and the prior stays unchanged, then when sample size is large MAP is very close to MLE: $\lim_{I\rightarrow\infty}\widehat{\vb*{\theta}}_{MAP}=\widehat{\vb*{\theta}}_{MLE}$ \medskip
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The beta-binomial model}
+Let  $\theta\sim\bet(\gamma_1,\gamma_2)$ be a beta-distributed random variable with parameters $(\gamma_1,\gamma_2)\in\R^2$, with PDF $f(\beta)=\frac{1}{B(\gamma_1,\gamma_2)}\beta^{\gamma_1-1}(1-\beta)^{\gamma_2-1}$ for $0\leq\beta\leq 1$. Let $\{X_i\}_{i\in N}$ be a sequence of $n$ independent and identical distributed Bernoulli random variables, with random parameter $\theta$: $X_i|\theta\sim\ber(\theta)$. Then, for fixed $\theta$, the number of successes in the sequence is distributed binomial $N_1=\sumi X_i\sim \bin(\theta,n)$, with PMF $p(k|\theta)=\binom{n}{k}\theta^k(1-\theta)^{n-k}$ for $k\in\{1, 2,..., n\}$. Then the \red{posterior predictive distribution} of $N_1$ is: 
+\begin{align*}
+    \pr(N_1=k) =& \int_{0}^{1} p(k|\beta)f(\beta)d\beta=\int_{0}^{1}\binom{n}{k}\beta^k(1-\beta)^{n-k}\frac{1}{B(\gamma_1,\gamma_2)}\beta^{\gamma_1-1}(1-\beta)^{\gamma_2-1}d\beta\\
+    =& \binom{n}{k}\frac{B(k+\gamma_1, n-k+\gamma_2)}{B(\gamma_1,\gamma_2)}
+\end{align*}
+
+Let this PMF be named $p_{N_1}(k)$
+

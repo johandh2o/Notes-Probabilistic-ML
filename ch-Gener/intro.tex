@@ -1,0 +1,60 @@
+% --------------- SECTION
+\section{Introduction}
+
+Let $Y$ be a real random variable, called the \red{class label} (discrete) or the \red{target variable} (continuous). $Y$ has marginal PDF/PMF $f_Y(y)$ and support  $\mathcal{Y}:=\supp{Y}$\medskip 
+
+Let $X$ be a $d$-dimensional random vector of the \red{features}. It has joint PDF/PMF $f_X(x)$ and support $\mathcal{X}:=\supp{X}$\medskip
+
+Let the joint PDF/PFM of $(Y,X)$ be $f(y,x)$; this is called the \red{full joint distribution}.\medskip
+
+A \red{learner}, \red{learning algorithm}, \red{learning hypothesis}, \red{predictor} or \red{classifier} (if $Y$ is discrete) from $X$ to $Y$ is a function $h:\mathcal{X}\mapsto\mathcal{Y}'\supseteq \mathcal{Y}$. A set $\mathcal{H}$ of learners form $X$ to $Y$ is called a \red{hypotheses space}.\medskip
+
+A \red{loss function} on some $(\mathcal{H},\mathcal{X},\mathcal{Y})$ is a function $L:\mathcal{H}\times \mathcal{X}\times\mathcal{Y}\mapsto \R_+$. For example:
+
+\begin{itemize}
+    \item The \red{0-1 loss} is $L(h,{x},y)=1-\mathbb{I}(h({x})=y)$
+    \item The \red{absolute loss}, or $L_1 $ loss, $L(h,{x},y)=\abs{h({x})-y}$
+    \item The \red{squared loss}, or $L_2$ loss, $L(h,{x},y)=(h({x})-y)^2$
+    \item The \red{log-likelihood loss}, or \red{log loss}, $L(h,x,y)=-\ln f_H(y)$, being $f_H$ the PDF/PMF of $h(X)$
+\end{itemize}
+
+The \red{risk} of a learner $h\in\mathcal{H}$, $R(h)$, is the \red{expected loss}, under the distribution of $(X,Y)$:
+\begin{equation*}
+    R(h) := \E_{X,Y} L(h(X),Y)
+\end{equation*}
+
+The \red{conditional risk} of $h\in\mathcal{H}$, given $X$ is then:
+\begin{equation*}
+    R(h|X) := \E_{Y|X} L(h(X),Y)
+\end{equation*}
+
+A \red{Bayes learner} $h^{*}:=h^*(L,X,Y)$ is a learner that has the minimum risk among all functions from $\mathcal{X}$ to $\mathcal{Y}$, using the loss function $L$:
+\begin{equation*}
+    h^{*}:=h^*(L,X,Y) \in \arginf_{h\in \mathcal{Y}^\mathcal{X}} R(h) = \arginf_{h\in\mathcal{Y}^\mathcal{X}} \E_{X,Y} L(h(X),Y)
+\end{equation*}
+
+Because $h^*$ depends on the distribution of $(X,Y)$ it will be unknown for most applied purposes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Empirical Risk Minimization}
+
+If we have a random sample $D=(X_i,Y_i)_{i=1}^N$, then it is possible to calculate the \red{empirical risk} of some $h\in\mathcal{H}$:
+\begin{equation*}
+    \widehat{R}(h) := \widehat{R}\left(h|D\right) = \frac{1}{N}\sum_{i=1}^NL(h(X_i),Y_i)
+\end{equation*}
+
+$\widehat{R}(h)$ is a unbiased estimator of $R(h)$ and of $R(h|X_1,\cdots, X_n)$. Also, by the Law of Large Numbers, $\forall h\in\mathcal{H},\ \lim_{n\rightarrow\infty}\widehat{R}(h)={R}(h)$ and $\lim_{n\rightarrow\infty}\widehat{R}(h)={R}(h|X_1,\cdots, X_n)$\medskip
+
+The \red{Empirical Risk Minimization} learner is such that minimizes the empirical risk on a hypothesis space $\mathcal{H}$
+\begin{equation*}
+    \widehat{h} := \widehat{h}\left((X_i,Y_i)_{i=1}^N\right) \in \argmin_{h\in\mathcal{H}}\widehat{R}\left(h|(X_i,Y_i)_{i=1}^N\right) = \argmin_{h\in\mathcal{H}} \frac{1}{N}\sum_{i=1}^NL(h(X_i),Y_i)
+\end{equation*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Probably Approximately Correct (PAC) Learning}
+A hypothesis class $\mathcal{H}$ is said to be \red{PAC learnable} with respect to $(L,X,Y)$ if
+\begin{multline*}
+    \exists\ m:(0,1)^2\mapsto\mathbb{N},\ \text{ algorithm } A_{\mathcal{H}}:\\ \forall \epsilon, \delta\in(0,1),\ f_{X,Y} \text{ PDF/PMF of } (X_i,Y_i), \\
+    \text{if } \widehat{h}\in A_{\mathcal{H}}\left((X_i,Y_i)_{i=1}^M\right)\subset\mathcal{H},\ M\geq m(\epsilon,\delta) \Rightarrow 
+    \pr\left(R(\widehat{h})-\min_{h'\in\mathcal{H}}R(h')\leq \epsilon \right)\geq 1-\delta
+\end{multline*}
