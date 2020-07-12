@@ -182,8 +182,9 @@ Blah
     \pr(Y=c_k|X =x,\mathfrak{D})\
     &\propto\ \E_{\delta}[p(c_k|\delta)|\mathfrak{D},\alpha]\times \E_{\theta}[f(x|c_k,\theta)|\mathfrak{D},\beta] \\
     &\propto\ \E [\delta_k|\mathfrak{D},\alpha] \times \E_{\theta}\left[\prod_{j=1}^d  f(x_j|c_k,\theta_{jk}) \Big|\mathfrak{D},\beta\right]\\
-    &\propto\ \E [\delta_k|\mathfrak{D},\alpha] \times \prod_{j=1}^d\E_{\theta}\left[  f(x_j|c_k,\theta_{jk}) \Big|\mathfrak{D},\beta\right]\ \text{ by independence} \\
-    &\propto\ \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E [\theta_{jk}|\mathfrak{D},\beta]^{\I(x_j=1)}\left(1-\E [\theta_{jk}|\mathfrak{D},\beta]\right)^{\I(x_j=0)}
+    &\propto\ \E [\delta_k|\mathfrak{D},\alpha] \times \prod_{j=1}^d\E_{\theta}\left[  f(x_j|c_k,\theta_{jk}) \Big|\mathfrak{D},\beta\right]\ \text{ by independence of features} \\
+    &\propto\ \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E [\theta_{jk}^{x_j}|\mathfrak{D},\beta]\ \text{ by Bernoulli trials decomposition}\\
+    &\propto\ \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E [\theta_{jk}|\mathfrak{D},\beta]^{x_j}\ \text{ by independence of Bernoulli trials}
 \end{align*}
 
 
