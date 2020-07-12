@@ -58,7 +58,7 @@ A similar analysis can be made when $\theta$ and $\delta$ are \textbf{stochastic
 In case of $\theta$ and $\delta$ being modeled as \textbf{deterministic}, then by \red{Bayes rule} the full joint distribution can be expressed in terms of the conditional PF of $X$ given $Y$: $f(x|y,\theta)$, and the marginal PMF of $Y$: $p(y|\delta)$, such that: 
 $f(y,x|\theta,\delta) = f(x|y,\theta)p(y|\delta)$
 
-Let $D=(y_i,x_i)_{i=1}^n=(\vb{y},\vb{X})$ be a \red{random sample}, then the \red{MLE} estimators of $\theta\in\Theta, \delta\in\Delta$ are:
+Let $\mathfrak{D}=(y_i,x_i)_{i=1}^n=(\vb{y},\vb{X})$ be a \red{random sample}, then the \red{MLE} estimators of $\theta\in\Theta, \delta\in\Delta$ are:
 \begin{align*}
     (\hat{\theta},\hat{\delta}) = \argsup_{\theta\in\Theta, \delta\in\Delta}l(\theta,\delta) &= \argsup_{\theta\in\Theta, \delta\in\Delta} \ln\prod_{i=1}^n p(y_i|\delta)f(x_i|y_i,\theta) \\
     &= \argsup_{\theta\in\Theta, \delta\in\Delta} \left[\sum_{i=1}^n\ln p(y_i|\delta)+\sum_{i=1}^n\ln f(x_i|y_i,\theta)\right] \\
@@ -77,7 +77,7 @@ MLE classifier is then:
 \subsection{Maximum a Posteriori}
 The trouble with MLE estimators is that they can lead to overfitting, specially when the estimators lie close or at the boundary of the parameter space. This overfitting can be \red{smoothened} by using a \red{Bayesian prior distributions} on $\delta$ and $\theta$. 
 
-Let $q(\delta|\alpha)$ be the PDF of $\delta$ and $g(\theta|\beta)$ be the PDF of $\theta$, with \red{hyperparameters} $\alpha\in A, \beta\in B$. Let $D=(y_i,x_i)_{i=1}^n=(\vb{y},\vb{X})$ be a \red{random sample}, then the \red{MAP} estimators of $\theta\in\Theta, \delta\in\Delta$ are:
+Let $q(\delta|\alpha)$ be the PDF of $\delta$ and $g(\theta|\beta)$ be the PDF of $\theta$, with \red{hyperparameters} $\alpha\in A, \beta\in B$. Let $\mathfrak{D}=(y_i,x_i)_{i=1}^n=(\vb{y},\vb{X})$ be a \red{random sample}, then the \red{MAP} estimators of $\theta\in\Theta, \delta\in\Delta$ are:
 \begin{align*}
     (\Tilde{\theta}, \Tilde{\delta}) 
     &= \argsup_{\theta\in\Theta, \delta\in\Delta} \ln\left[g(\theta|\beta)q(\delta|\alpha) \prod_{i=1}^np(y_i|\delta) f(x_i|y_i,\theta) \right]\\
@@ -97,12 +97,26 @@ MAP classifier is based on an approximation named the \red{plug-in approximation
     \hat{y}=\hat{h}(x_0) \in \argmax_{y\,\in\mathcal{Y}}\left[ \ln p(y|\Tilde{\delta})+\ln f(x_0|y,\Tilde{\theta})\right]
 \end{equation*}
 
-It is an asymptotic approximation (in some cases exact) of the \red{predictive posterior distribution}:
+%------------- subsection
+\subsection{Full Bayesian approach}
+MAP is an asymptotic approximation  of the \red{predictive posterior distribution}. 
+\begin{equation*}
+   p(c_k|x,\Tilde{\theta},\Tilde{\delta}) \longrightarrow \pr(Y=c_k|X=x,\mathfrak{D}) = \int_{\Delta}\int_{\Theta}p(c_k|x,\theta,\delta)g(\theta|\mathfrak{D},\beta)q(\delta|\mathfrak{D},\alpha)d\theta d\delta
+\end{equation*}
+
+Where $q(\delta|\mathfrak{D},\alpha)$ and $g(\theta|\mathfrak{D},\beta)$ are \red{posterior distributions}:
 \begin{align*}
-   p(y|x,\Tilde{\theta},\Tilde{\delta}) \longrightarrow \pr(Y=y|X=x) &= \int_{\Delta}\int_{\Theta}p(y|x,\theta,\delta)g(\theta|\beta)q(\delta|\alpha)d\theta d\delta\\ &= \int_{\Delta}\int_{\Theta}\frac{f(x|y,\theta)p(y|\delta)}{\sum_{k=1}^K f(x|c_k,\theta)p(c_k|\delta)}g(\theta|\beta)q(\delta|\alpha)d\theta d\delta
+    q(\delta|\mathfrak{D},\alpha)\ & \propto\ q(\delta|\alpha)\prod_{i=1}^n p(y_i|\delta)\\    g(\theta|\mathfrak{D},\beta)\ & \propto\  g(\theta|\beta)\prod_{i=1}^n f(x_i|\theta)
 \end{align*}
 
-However, in some cases $p(y|x,\Tilde{\theta},\Tilde{\delta}) $ may not approximate well the predictive posterior distribution, specially in small sample sizes. Also, MAP \textbf{is not invariant to reparametrization}, unline MLE or the full Bayesian approach.
+However, in some cases $p(c_k|x,\Tilde{\theta},\Tilde{\delta}) $ may not approximate well the predictive posterior distribution, specially in small sample sizes. Also, MAP \textbf{is not invariant to reparametrization}, unline MLE. For this, a full Bayesian approach may be better:
+\begin{align*}
+    \pr(Y=c_k|X=x,\mathfrak{D}) &=\int_{\Delta}\int_{\Theta}p(c_k|x,\theta,\delta)g(\theta|\mathfrak{D},\beta)q(\delta|\mathfrak{D},\alpha)d\theta d\delta \\
+    &\propto\ \int_{\Delta} p(c_k|\delta)q(\delta|\mathfrak{D},\alpha) d\delta\times \int_{\Theta}f(x|c_k,\theta) g(\theta|\mathfrak{D},\beta) d\theta
+\end{align*}
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %------------- SECTION ---------------------------------
@@ -116,13 +130,13 @@ The naïve Bayes approach assumes that features are \red{conditionally independe
 
 The maximization process is separable, so we get $\hat{\delta}_{k}=n_k/n$, and the MLE estimators of $\theta$ can be found with:
 \begin{equation*}
-    \hat{\theta}  = \argsup_{\theta\in\Theta} \sum_{i=1}^n\ln\prod_{j=1}^d f(x_{i,j}|y_i,\theta) = \argsup_{\theta\in\Theta} \sum_{i=1}^n\sum_{j=1}^d\sum_{k=1}^K\I(y_i=c_k)\ln f(x_{i,j}|y_i,\theta_{j,k})
+    \hat{\theta}  = \argsup_{\theta\in\Theta} \sum_{i=1}^n\ln\prod_{j=1}^d f(x_{i,j}|y_i,\theta) = \argsup_{\theta\in\Theta} \sum_{i=1}^n\sum_{k=1}^K\I(y_i=c_k)\sum_{j=1}^d\ln f(x_{i,j}|y_i,\theta_{j,k})
 \end{equation*}
 
-
+\subsubsection*{Beta-Binomial naïve Bayes}
 If all features are Bernoulli random variables, $X_{i,j}|(Y_i=c_k)\overset{iid}{\sim}\text{Ber}(\theta_{j,k})$, MLE estimator are:
 \begin{equation*}
-    \hat{\theta}_{j,k} = \frac{n_{j,k}}{n_k},\ \text{ where } n_{j,k}=\sum_{i=1}^n\I(y_i=c_k,x_{i,j}=1)
+    \hat{\theta}_{j,k} = \frac{n_{j,k}}{n_k},\ \text{ where } n_{j,k}=\sum_{i=1}^n\I(y_i=c_k)x_{i,j}
 \end{equation*}
 
 This model is known as \red{bag of words model}, where every $X_{i,j}$ represents the presence or absence of word $j$ in document $i$. It is used to classify documents. 
@@ -131,20 +145,56 @@ However, MLE can overfit, specially when $\hat{\theta}_{j,k}=1\ (\text{or } 0),\
 
 Let $\delta\sim\text{Dir}(\alpha)$ and $\theta$ have some distribution with PDF $g(\theta|\beta)$. Then MAP estimators are $\Tilde{\delta}_k = (n_k+\alpha_k)/(n+\sum_{c=1}^K\alpha_c)$ and:
 \begin{equation*}
-    \Tilde{\theta} = \argsup_{\theta\in\Theta} \left[\ln g(\theta|\beta)+ \sum_{i=1}^n\sum_{j=1}^d\sum_{k=1}^K\I(y_i=c_k)\ln f(x_{i,j}|y_i,\theta_{j,k})\right]
+    \Tilde{\theta} = \argsup_{\theta\in\Theta} \left[\ln g(\theta|\beta)+ \sum_{i=1}^n\sum_{k=1}^K\I(y_i=c_k)\sum_{j=1}^d\ln f(x_{i,j}|y_i,\theta_{j,k})\right]
 \end{equation*}
 
-If all features are Bernoulli random variables, $X_{i,j}|(Y_i=c_k)\overset{iid}{\sim}\text{Ber}(\theta_{j,k})$, and $\beta$ follows a \red{Beta distribution}, $\theta\sim\text{Bet}(\beta_0,\beta_1),\ \beta_{0,1}>0$, MAP estimator are:
+If $\theta$ follows a \red{Beta distribution}, $\theta_{j,k}{\sim}\text{Bet}(\beta_1,\beta_2),\ \beta_{1,2}>0$, MAP estimator are:
 \begin{equation*}
-    \hat{\theta}_{j,k} = \frac{n_{j,k}+\beta_0-1}{n_k+\beta_0+\beta_1-2},\ \text{ where } n_{j,k}=\sum_{i=1}^n\I(y_i=c_k,x_{i,j}=1)
+    \hat{\theta}_{j,k} = \frac{n_{j,k}-1+\beta_1}{n_k-2+\beta_1+\beta_2},\ \text{ where } n_{j,k}=\sum_{i=1}^n\I(y_i=c_k)x_{i,j}
+\end{equation*}
+
+\subsubsection*{Dirichlet-Multinomial naïve Bayes}
+Beta-Bernoulli naïve Bayes does not work particularly well for document classification, because it does not count the number of times each word appears in each document. It neither takes into account the \textit{burstiness}: the phenomenon that most words never appear in any given document, but if they do appear once, they are likely to appear more than once. Thus, Dirichlet-Multinomial naïve Bayes can help better.
+
+If all features are \red{Dirichlet-Multinomial} random variables, $X_{i,j}|(Y_i=c_k)\overset{iid}{\sim}\text{Mul}(\theta_{j,k},n_k)$, and we as prior distributions $\delta\sim\text{Dir}(\alpha)$ and $\theta_k\sim\text{Dir}(\beta_1,\beta_2,\cdots,\beta_d)$. Then MAP estimators are $\Tilde{\delta}_k = (n_k+\alpha_k)/(n+\sum_{c=1}^K\alpha_c)$ and:
+\begin{equation*}
+    \Tilde{\theta} = \argsup_{\theta\in\Theta}  \sum_{i=1}^n\sum_{k=1}^K\I(y_i=c_k)\sum_{j=1}^d(n_{jk}+\beta_j-1)\ln \theta_{jk} \Longrightarrow \hat{\theta}_{j,k} = \frac{n_{j,k}-1+\beta_j}{n_k-d+\sum_{j=1}^d\beta_j}
+\end{equation*}
+\begin{equation*}
+    \text{Where } n_{j,k}=\sum_{i=1}^n\I(y_i=c_k)x_{i,j}
+\end{equation*}
+
+%------------- subsection
+\subsection{Prediction}
+
+\subsubsection*{Plug-in approximation}
+Using the MAP plug-in approximation we have that the estimated probability of observing $Y=c_k$ given that $X=x$ is:
+\begin{equation*}
+    p(c_k|x, \Tilde{\theta},\Tilde{\delta})\, \propto\ p(c_k|\Tilde{\delta})f(x|c_k,\Tilde{\theta})\, \propto\  \Tilde{\delta}_k\prod_{j=1}^d \Tilde{\theta}_{jk}^{x_j}
 \end{equation*}
 
 
+\subsubsection*{Full Bayesian approach}
+
+Blah
+\begin{align*}
+    \pr(Y=c_k|X &=x,\mathfrak{D}) =\int_{\Delta}\int_{\Theta}p(c_k|x,\theta,\delta)g(\theta|\mathfrak{D},\beta)q(\delta|\mathfrak{D},\alpha)d\theta d\delta \\
+    &\propto\ \int_{\Delta} p(c_k|\delta)q(\delta|\mathfrak{D},\alpha) d\delta\times \int_{\Theta}f(x|c_k,\theta) g(\theta|\mathfrak{D},\beta) d\theta \\
+    &\propto\ \int_0^1 p(c_k|\delta_k) q(\delta_k|\mathfrak{D},\alpha) d\delta_k\times \prod_{j=1}^d \int_0^1 f(x_j|c_k,\theta_{jk}) g(\theta_{jk}|\mathfrak{D},\beta) d\theta_{jk}\\
+    &\propto\ \int_0^1 \delta_k q(\delta_k|\mathfrak{D},\alpha) d\delta_k\times \prod_{j=1}^d \int_0^1 \theta_{jk}^{\I(x_j=1)} g(\theta_{jk}|\mathfrak{D},\beta) d\theta_{jk}\int_0^1(1-\theta_{jk})^{\I(x_j=0)} g(\theta_{jk}|\mathfrak{D},\beta) d\theta_{jk}\\
+    &\propto\ \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E [\theta_{jk}|\mathfrak{D},\beta]^{\I(x_j=1)}\left(1-\E [\theta_{jk}|\mathfrak{D},\beta]\right)^{\I(x_j=0)}
+\end{align*}
 
 
 
 
-\subsection{Prediction}
+
+
+
+
+
+
+
 The naïve Bayes classifier is based on the plug-in approximation of the predictive posterior probability:
 \begin{align*}
     \hat{y}=\hat{h}(x) &\in   \argmax_{y\,\in\mathcal{Y}}p(y|x,\Tilde{\theta},\Tilde{\delta})  = \argmax_{y\,\in\mathcal{Y}} f(x|y,\hat{\theta})p(y|\hat{\delta})\\
