@@ -112,7 +112,8 @@ Where $q(\delta|\mathfrak{D},\alpha)$ and $g(\theta|\mathfrak{D},\beta)$ are \re
 However, in some cases $p(c_k|x,\Tilde{\theta},\Tilde{\delta}) $ may not approximate well the predictive posterior distribution, specially in small sample sizes. Also, MAP \textbf{is not invariant to reparametrization}, unline MLE. For this, a full Bayesian approach may be better:
 \begin{align*}
     \pr(Y=c_k|X=x,\mathfrak{D}) &=\int_{\Delta}\int_{\Theta}p(c_k|x,\theta,\delta)g(\theta|\mathfrak{D},\beta)q(\delta|\mathfrak{D},\alpha)d\theta d\delta \\
-    &\propto\ \int_{\Delta} p(c_k|\delta)q(\delta|\mathfrak{D},\alpha) d\delta\times \int_{\Theta}f(x|c_k,\theta) g(\theta|\mathfrak{D},\beta) d\theta
+    &\propto\ \int_{\Delta} p(c_k|\delta)q(\delta|\mathfrak{D},\alpha) d\delta\times \int_{\Theta}f(x|c_k,\theta) g(\theta|\mathfrak{D},\beta) d\theta\\
+    &\propto\ \E_{\delta}[p(c_k|\delta)|\mathfrak{D},\alpha]\times \E_{\theta}[f(x|c_k,\theta)|\mathfrak{D},\beta]
 \end{align*}
 
 
@@ -178,10 +179,10 @@ Using the MAP plug-in approximation we have that the estimated probability of ob
 
 Blah
 \begin{align*}
-    \pr(Y=c_k|X &=x,\mathfrak{D}) =\int_{\Delta}\int_{\Theta}p(c_k|x,\theta,\delta)g(\theta|\mathfrak{D},\beta)q(\delta|\mathfrak{D},\alpha)d\theta d\delta \\
-    &\propto\ \int_{\Delta} p(c_k|\delta)q(\delta|\mathfrak{D},\alpha) d\delta\times \int_{\Theta}f(x|c_k,\theta) g(\theta|\mathfrak{D},\beta) d\theta \\
-    &\propto\ \int_0^1 p(c_k|\delta_k) q(\delta_k|\mathfrak{D},\alpha) d\delta_k\times \prod_{j=1}^d \int_0^1 f(x_j|c_k,\theta_{jk}) g(\theta_{jk}|\mathfrak{D},\beta) d\theta_{jk}\\
-    &\propto\ \int_0^1 \delta_k q(\delta_k|\mathfrak{D},\alpha) d\delta_k\times \prod_{j=1}^d \int_0^1 \theta_{jk}^{\I(x_j=1)} g(\theta_{jk}|\mathfrak{D},\beta) d\theta_{jk}\int_0^1(1-\theta_{jk})^{\I(x_j=0)} g(\theta_{jk}|\mathfrak{D},\beta) d\theta_{jk}\\
+    \pr(Y=c_k|X =x,\mathfrak{D})\
+    &\propto\ \E_{\delta}[p(c_k|\delta)|\mathfrak{D},\alpha]\times \E_{\theta}[f(x|c_k,\theta)|\mathfrak{D},\beta] \\
+    &\propto\ \E [\delta_k|\mathfrak{D},\alpha] \times \E_{\theta}\left[\prod_{j=1}^d  f(x_j|c_k,\theta_{jk}) \Big|\mathfrak{D},\beta\right]\\
+    &\propto\ \E [\delta_k|\mathfrak{D},\alpha] \times \prod_{j=1}^d\E_{\theta}\left[  f(x_j|c_k,\theta_{jk}) \Big|\mathfrak{D},\beta\right]\ \text{ by independence} \\
     &\propto\ \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E [\theta_{jk}|\mathfrak{D},\beta]^{\I(x_j=1)}\left(1-\E [\theta_{jk}|\mathfrak{D},\beta]\right)^{\I(x_j=0)}
 \end{align*}
 
