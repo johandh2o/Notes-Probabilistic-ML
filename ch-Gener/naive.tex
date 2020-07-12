@@ -106,7 +106,8 @@ MAP is an asymptotic approximation  of the \red{predictive posterior distributio
 
 Where $q(\delta|\mathfrak{D},\alpha)$ and $g(\theta|\mathfrak{D},\beta)$ are \red{posterior distributions}:
 \begin{align*}
-    q(\delta|\mathfrak{D},\alpha)\ & \propto\ q(\delta|\alpha)\prod_{i=1}^n p(y_i|\delta)\\    g(\theta|\mathfrak{D},\beta)\ & \propto\  g(\theta|\beta)\prod_{i=1}^n f(x_i|\theta)
+    q(\delta|\mathfrak{D},\alpha)\ & \propto\ q(\delta|\alpha)\prod_{i=1}^n p(y_i|\delta)\\ 
+    g(\theta|\mathfrak{D},\beta)\ & \propto\  g(\theta|\beta)\prod_{i=1}^n f(x_i|y_i,\theta)
 \end{align*}
 
 However, in some cases $p(c_k|x,\Tilde{\theta},\Tilde{\delta}) $ may not approximate well the predictive posterior distribution, specially in small sample sizes. Also, MAP \textbf{is not invariant to reparametrization}, unline MLE. For this, a full Bayesian approach may be better:
@@ -159,7 +160,7 @@ Beta-Bernoulli naïve Bayes does not work particularly well for document classif
 
 If all features are \red{Dirichlet-Multinomial} random variables, $X_{i,j}|(Y_i=c_k)\overset{iid}{\sim}\text{Mul}(\theta_{j,k},n_k)$, and we as prior distributions $\delta\sim\text{Dir}(\alpha)$ and $\theta_k\sim\text{Dir}(\beta_1,\beta_2,\cdots,\beta_d)$. Then MAP estimators are $\Tilde{\delta}_k = (n_k+\alpha_k)/(n+\sum_{c=1}^K\alpha_c)$ and:
 \begin{equation*}
-    \Tilde{\theta} = \argsup_{\theta\in\Theta}  \sum_{i=1}^n\sum_{k=1}^K\I(y_i=c_k)\sum_{j=1}^d(n_{jk}+\beta_j-1)\ln \theta_{jk} \Longrightarrow \hat{\theta}_{j,k} = \frac{n_{j,k}-1+\beta_j}{n_k-d+\sum_{j=1}^d\beta_j}
+    \Tilde{\theta} = \argsup_{\theta\in\Theta}  \sum_{i=1}^n\sum_{k=1}^K\I(y_i=c_k)\sum_{j=1}^d(n_{j,k}+\beta_j-1)\ln \theta_{j,k} \Longrightarrow \hat{\theta}_{j,k} = \frac{n_{j,k}-1+\beta_j}{n_k-d+\sum_{e=1}^d\beta_e}
 \end{equation*}
 \begin{equation*}
     \text{Where } n_{j,k}=\sum_{i=1}^n\I(y_i=c_k)x_{i,j}
@@ -171,7 +172,7 @@ If all features are \red{Dirichlet-Multinomial} random variables, $X_{i,j}|(Y_i=
 \subsubsection*{Plug-in approximation}
 Using the MAP plug-in approximation we have that the estimated probability of observing $Y=c_k$ given that $X=x$ is:
 \begin{equation*}
-    p(c_k|x, \Tilde{\theta},\Tilde{\delta})\, \propto\ p(c_k|\Tilde{\delta})f(x|c_k,\Tilde{\theta})\, \propto\  \Tilde{\delta}_k\prod_{j=1}^d \Tilde{\theta}_{jk}^{x_j}
+    p(c_k|x, \Tilde{\theta},\Tilde{\delta})\, \propto\ p(c_k|\Tilde{\delta})f(x|c_k,\Tilde{\theta})\, \propto\  \Tilde{\delta}_k\prod_{j=1}^d \Tilde{\theta}_{j,k}^{x_j}
 \end{equation*}
 
 
@@ -181,11 +182,37 @@ Blah
 \begin{align*}
     \pr(Y=c_k|X =x,\mathfrak{D})\
     &\propto\ \E_{\delta}[p(c_k|\delta)|\mathfrak{D},\alpha]\times \E_{\theta}[f(x|c_k,\theta)|\mathfrak{D},\beta] \\
-    &\propto\ \E [\delta_k|\mathfrak{D},\alpha] \times \E_{\theta}\left[\prod_{j=1}^d  f(x_j|c_k,\theta_{jk}) \Big|\mathfrak{D},\beta\right]\\
-    &\propto\ \E [\delta_k|\mathfrak{D},\alpha] \times \prod_{j=1}^d\E_{\theta}\left[  f(x_j|c_k,\theta_{jk}) \Big|\mathfrak{D},\beta\right]\ \text{ by independence of features} \\
-    &\propto\ \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E [\theta_{jk}^{x_j}|\mathfrak{D},\beta]\ \text{ by Bernoulli trials decomposition}\\
-    &\propto\ \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E [\theta_{jk}|\mathfrak{D},\beta]^{x_j}\ \text{ by independence of Bernoulli trials}
+    &\propto\ \E [\delta_k|\mathfrak{D},\alpha] \times \E_{\theta}\left[\prod_{j=1}^d  f(x_j|c_k,\theta_{j,k}) \Big|\mathfrak{D},\beta\right]\\
+    &\propto\ \E [\delta_k|\mathfrak{D},\alpha] \times \prod_{j=1}^d\E_{\theta}\left[  f(x_j|c_k,\theta_{j,k}) \Big|\mathfrak{D},\beta\right]\ \text{ by independence of features} \\
+    &\propto\ \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E \left[\prod_{b=1}^{x_j}\theta_{j,k}|\mathfrak{D},\beta\right]\ \text{ by Bernoulli trials decomposition}\\
+    &\propto\ \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E [\theta_{j,k}|\mathfrak{D},\beta]^{x_j}\ \text{ by independence of Bernoulli trials}
 \end{align*}
+
+Thus, the predictive posterior probability depends on the expected value of the posterior probabilities. In this case, the posterior distribution are tractable because the prior distributions are \red{conjugate}.
+
+In the case of the posterior distribution of $\delta$ we have:
+\begin{equation*}
+    q(\delta|\mathfrak{D},\alpha)\ \propto\ q(\delta|\alpha)\prod_{i=1}^n p(y_i|\delta_k)\ \propto\ \prod_{k=1}^K\delta_k^{\alpha_k-1+n_k}\Rightarrow \text{Dir}(\alpha_1+n_1,\cdots,\alpha_K+n_K)
+\end{equation*}
+
+Then the \red{marginal posterior distribution} of component $k$ of $\text{Dir}(\alpha_1+n_1,\cdots,\alpha_K+n_K)$ is $\text{Bet}(n_k+\alpha_k, n-n_k+\sum_{c=1}^K\alpha_c-\alpha_k)$, which means:
+\begin{equation*}
+    \E [\delta_k|\mathfrak{D},\alpha] = \frac{n_k+\alpha_k}{n+\sum_{c=1}^K\alpha_c} = \Tilde{\delta}_k
+\end{equation*}
+
+In the case of the posterior distribution of $\theta_k$ we have:
+\begin{equation*}
+    g(\theta_k|\mathfrak{D},\beta)\  \propto\  g(\theta_k|\beta)\prod_{i=1}^n f(x_i|y_i,\theta)^{\I(y_i=c_k)}\ \propto\ \prod_{j=1}^d \theta_{j,k}^{\beta_j-1+n_{j,k}}\Rightarrow \text{Dir}(\beta_1+n_{1,k},\cdots,\beta_d+n_{d,k})
+\end{equation*}
+
+Then the \red{marginal posterior distribution} of component $j$ of $\text{Dir}(\beta_1+n_{1,k},\cdots,\beta_d+n_{d,k})$ is $\text{Bet}(n_{j,k}+\beta_j, n_k-n_{j,k}+\sum_{e=1}^d\beta_e-\beta_j)$, which means:
+\begin{equation*}
+    \E [\theta_{j,k}|\mathfrak{D},\beta] = \frac{n_{j,k}+\beta_j}{n_k+\sum_{e=1}^d\beta_e} \neq \Tilde{\theta}_{j,k}
+\end{equation*}
+
+\newpage
+
+
 
 
 
