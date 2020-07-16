@@ -169,16 +169,20 @@ If all features are \red{Dirichlet-Multinomial} random variables, $X_{i,j}|(Y_i=
 %------------- subsection
 \subsection{Prediction}
 
-\subsubsection*{Plug-in approximation}
+\subsubsection*{MAP plug-in approximation for Dirichlet-Multinomial naïve Bayes}
 Using the MAP plug-in approximation we have that the estimated probability of observing $Y=c_k$ given that $X=x$ is:
 \begin{equation*}
-    p(c_k|x, \Tilde{\theta},\Tilde{\delta})\, \propto\ p(c_k|\Tilde{\delta})f(x|c_k,\Tilde{\theta})\, \propto\  \Tilde{\delta}_k\prod_{j=1}^d \Tilde{\theta}_{j,k}^{x_j}
+    p(c_k|x, \Tilde{\theta},\Tilde{\delta})\, \propto\ p(c_k|\Tilde{\delta})f(x|c_k,\Tilde{\theta})\, \propto\  \Tilde{\delta}_k\prod_{j=1}^d \Tilde{\theta}_{j,k}^{x_j} 
 \end{equation*}
 
+Then, the best prediction of $Y$ given $X=x$ and given the data $\mathfrak{D}$ is:
+\begin{equation*}
+    \hat{y} = c_{\kappa},\ \kappa \in \argmax_{\kappa\in [K]} \Tilde{\delta}_k\prod_{j=1}^d \Tilde{\theta}_{j,k}^{x_j} 
+\end{equation*}
 
-\subsubsection*{Full Bayesian approach}
+\subsubsection*{Full Bayesian approach for Dirichlet-Multinomial naïve Bayes}
 
-Blah
+Using the full Bayesian approach we have that:
 \begin{align*}
     \pr(Y=c_k|X =x,\mathfrak{D})\
     &\propto\ \E_{\delta}[p(c_k|\delta)|\mathfrak{D},\alpha]\times \E_{\theta}[f(x|c_k,\theta)|\mathfrak{D},\beta] \\
@@ -188,7 +192,7 @@ Blah
     &\propto\ \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E [\theta_{j,k}|\mathfrak{D},\beta]^{x_j}\ \text{ by independence of Bernoulli trials}
 \end{align*}
 
-Thus, the predictive posterior probability depends on the expected value of the posterior probabilities. In this case, the posterior distribution are tractable because the prior distributions are \red{conjugate}.
+Thus, the predictive posterior probability depends on the expected value of the posterior distributions. In this case, the posterior distribution are tractable because the prior distributions are \red{conjugate}.
 
 In the case of the posterior distribution of $\delta$ we have:
 \begin{equation*}
@@ -210,141 +214,7 @@ Then the \red{marginal posterior distribution} of component $j$ of $\text{Dir}(\
     \E [\theta_{j,k}|\mathfrak{D},\beta] = \frac{n_{j,k}+\beta_j}{n_k+\sum_{e=1}^d\beta_e} \neq \Tilde{\theta}_{j,k}
 \end{equation*}
 
-\newpage
-
-
-
-
-
-
-
-
-
-
-
-
-
-The naïve Bayes classifier is based on the plug-in approximation of the predictive posterior probability:
-\begin{align*}
-    \hat{y}=\hat{h}(x) &\in   \argmax_{y\,\in\mathcal{Y}}p(y|x,\Tilde{\theta},\Tilde{\delta})  = \argmax_{y\,\in\mathcal{Y}} f(x|y,\hat{\theta})p(y|\hat{\delta})\\
-    &= \argmax_{y\,\in\mathcal{Y}}p(y|\hat{\delta})\prod_{j=1}^d\prod_{k=1}^K  f(x_{i,j}|y,\hat{\theta}_{j,k})^{\I(y=c_k)}\\
-    &= \argmax_{y\,\in\mathcal{Y}}\left[ \ln p(y|\hat{\delta})+\sum_{k=1}^K\I(y=c_k)\sum_{j=1}^d  \ln f(x_{i,j}|y,\hat{\theta}_{j,k})\right]
-\end{align*}
-
-
-
-
-\clearpage
-Let $L:\mathcal{Y}\times\mathcal{X}\mapsto\R_+$ be the \red{log-loss} defined as $L(y,x) = -\ln f(y,x|\theta),\ \forall y\in\mathcal{Y},\ x\in\mathcal{X}$
-
-
-
-
-
-
-
-
-
-By \red{Bayes rule} the log-loss can be expressed in terms of the conditional PMF of $Y$ given $X$: $p(y|x,\theta_1)$, and the joint PF of $X$: $f_X(x|\theta_2)$.
+The best prediction of $Y$ given $X=x$ and given the data $\mathfrak{D}$ is:
 \begin{equation*}
-    L(y,x) = -\ln p(y|x,\theta_1)-\ln f_X(x|\theta_2),\ \forall y\in\mathcal{Y},\ x\in\mathcal{X}
+    \hat{y} = c_{\kappa},\ \kappa \in \argmax_{\kappa\in [K]} \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E [\theta_{j,k}|\mathfrak{D},\beta]^{x_j}
 \end{equation*}
-
-
-
-
-
-
-
-
-
-
-
-\subsubsection{Predictive posterior distribution}
-
-The conditional PMF $p_{Y|X}(y|x)=\pr(Y=y|\va{x}=\vb{x})$ is called the PMF of the \red{predictive posterior distribution} of $Y$ given $\va{x}=\vb{x}$. Let $p_Y(y)=\pr(Y=y)$ be the PMF of the \red{prior class label distribution} of $Y$, and $f_{X|Y}(x|y)$ be the conditional PDF of the distribution of $X$ given $Y=y$. By \red{Bayes Law}:
-\begin{equation*}
-    p_{Y|X}(y|x)= \frac{f_{X|Y}(x|y)p_Y(y)}{\sum_{k=1}^Kf_{X|Y}(x|c_k)p_Y(c_k)}
-\end{equation*}
-
-\subsubsection{Estimating the parameters of the class distribution}
-
-
-
-Let $Y$ be a discrete random variable that follows a 
-\red{categorical distribution} $Y\sim\textrm{Cat}(\vb{q})$, with $K$ classes: $\mathcal{Y} =\{c_1,c_2,...,c_K\}$, and PMF $p_Y(y|\vb{q})$ parametrized with $\vb{q}\in \Delta^K = \{\vb{d}\in[0,1]^K: \vb{d}\cdot\vb{1}_K=1 \}$. Since $\vb{q}$ is unknown, it can be modeled as having a  \red{symmetric Dirichlet distribution} with PDF $f_q(\vb{q})$: 
-\begin{align*}
-    p_Y(y|\vb{q}) & =\prod_{k=1}^Kq_{k}^{\I(y=c_k)}, \ \forall y\in\{c_1,c_2,...,c_K\},\ \vb{q}\in \Delta^K \\
-    f_q(\vb{q}|\alpha) &= \frac{1}{B(\alpha\vb{1}_K)}\prod_{k=1}^Kq_{k}^{\alpha-1},\ \forall \vb{q}\in \Delta^K,\ \alpha>0
-\end{align*}
-
-Let $(y_i)_{i=1}^I$ be a \red{random sample} of $Y$, and let $c_k=\sum_{i=1}^I\I(y_i=c_k)$ be the count of category $c_k$ in the data. Then the \red{Maximum Likelihood Estimator (MLE)} and the \red{Maximum a Posteriori Estimator (MAP)} of $\vb{q}$ are:
-\begin{align*}
-    \widehat{\vb{q}}_{MLE} &\in\argmax\limits_{\vb{q}\in\Delta^K}\prod_{i=1}^I p_Y(y_i|\vb{q})
-    =\argmax\limits_{\vb{q}\in\Delta^K}\prod_{i=1}^I \prod_{k=1}^Kq_{k}^{\I(y_i=c_k)}
-    =\argmax\limits_{\vb{q}\in\Delta^K} \prod_{k=1}^Kq_{k}^{c_k} \\
-    &=\argmax\limits_{\vb{q}\in\Delta^K}\sum_{k=1}^Kc_k\ln q_{k} \Rightarrow \widehat{q}_k=\frac{c_k}{\sum_{k=1}^Kc_k}=\frac{c_k}{I}
-\end{align*}
-
-\begin{align*}
-    \widehat{\vb{q}}_{MAP} &\in\argmax\limits_{\vb{q}\in\Delta^K}\prod_{i=1}^I p_Y(y_i|\vb{q})f_q(\vb{q}|\alpha)
-    =\argmax\limits_{\vb{q}\in\Delta^K} \prod_{k=1}^Kq_{k}^{c_k}\times \frac{1}{B(\alpha\vb{1}_K)}\prod_{k=1}^Kq_{k}^{\alpha-1} \\
-    &=\argmax\limits_{\vb{q}\in\Delta^K}\sum_{k=1}^K\left(c_k+\alpha-1\right)\ln q_{k} \Rightarrow \widehat{q}_k=\frac{c_k+\alpha-1}{\sum_{k=1}^K(c_k+\alpha-1)}=\frac{c_k+\alpha-1}{I+K(\alpha-1)}
-\end{align*}
-
-
-
-
-\subsubsection{Estimating the parameters of the features distribution}
-
-Let $\va{x}$ be a $J$-dimensional random vector (discrete or continuous) with conditional PDF (PMF) given $Y=y$: $f_X(\vb{x}|\vb*{\theta}_y,y)$, which is parametrized with $\vb*{\theta}_y\in\Theta$. Since this parameter is unknown, it can be modeled as having a distribution with PDF $f_\theta(\theta|y)$\medskip
-
-By \red{Bayes Law}:
-\begin{equation*}
-    f_{\theta|X}(\vb*{\theta}|\vb{x})=\frac{f_{X}(\vb{x}|\vb*{\theta})f_\theta(\vb*{\theta})}{f(\vb{x})}\propto f_{X}(\vb{x}|\vb*{\theta})f_\theta(\vb*{\theta})
-\end{equation*}
-
-$f_{X}(\vb{x}|\vb*{\theta})$ is the \red{likelihood} of $\vb*{\theta}$ given a single data point $\vb{x}$, $f_\theta(\vb*{\theta})$ is the PDF of the \red{prior distribution} of $\vb*{\theta}$, and  $f_{\theta|X}(\vb*{\theta}|\vb{x})$ is the PDF of the \red{posterior distribution} of $\vb*{\theta}$\medskip
-
-Let $(\vb{x}_i)_{i=1}^I$ be a \red{random sample} (independent and identically distributed) of $\va{x}$. Then the \red{Maximum Likelihood Estimator (MLE)} of $\vb*{\theta}$ maximizes the likelihood given the data, and the \red{Maximum a Posteriori Estimator (MAP)} of $\vb*{\theta}$ maximizes the joint posterior probability of the data. This is:
-\begin{align*}
-    \widehat{\vb*{\theta}}_{MLE} &\in\argmax\limits_{\vb*{\theta}\in\Theta}\prod_{i=1}^I f_{X}(\vb{x}_i|\vb*{\theta}) = \argmax\limits_{\vb*{\theta}\in\Theta}\sum_{i=1}^I\ln f_{X}(\vb{x}_i|\vb*{\theta})\\
-    \widehat{\vb*{\theta}}_{MAP} &\in\argmax\limits_{\vb*{\theta}\in\Theta}f_\theta(\vb*{\theta})
-    \prod_{i=1}^I f_{X}(\vb{x}_i|\vb*{\theta}) = \argmax\limits_{\vb*{\theta}\in\Theta}\left(\ln f_\theta(\vb*{\theta})+\sum_{i=1}^I\ln f_{X}(\vb{x}_i|\vb*{\theta})\right)
-\end{align*}
-
-As the likelihood grows exponentially with $I$, and the prior stays unchanged, then when sample size is large MAP is very close to MLE: $\lim_{I\rightarrow\infty}\widehat{\vb*{\theta}}_{MAP}=\widehat{\vb*{\theta}}_{MLE}$ \medskip
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{The beta-binomial model}
-Let  $\theta\sim\bet(\gamma_1,\gamma_2)$ be a beta-distributed random variable with parameters $(\gamma_1,\gamma_2)\in\R^2$, with PDF $f(\beta)=\frac{1}{B(\gamma_1,\gamma_2)}\beta^{\gamma_1-1}(1-\beta)^{\gamma_2-1}$ for $0\leq\beta\leq 1$. Let $\{X_i\}_{i\in N}$ be a sequence of $n$ independent and identical distributed Bernoulli random variables, with random parameter $\theta$: $X_i|\theta\sim\ber(\theta)$. Then, for fixed $\theta$, the number of successes in the sequence is distributed binomial $N_1=\sumi X_i\sim \bin(\theta,n)$, with PMF $p(k|\theta)=\binom{n}{k}\theta^k(1-\theta)^{n-k}$ for $k\in\{1, 2,..., n\}$. Then the \red{posterior predictive distribution} of $N_1$ is: 
-\begin{align*}
-    \pr(N_1=k) =& \int_{0}^{1} p(k|\beta)f(\beta)d\beta=\int_{0}^{1}\binom{n}{k}\beta^k(1-\beta)^{n-k}\frac{1}{B(\gamma_1,\gamma_2)}\beta^{\gamma_1-1}(1-\beta)^{\gamma_2-1}d\beta\\
-    =& \binom{n}{k}\frac{B(k+\gamma_1, n-k+\gamma_2)}{B(\gamma_1,\gamma_2)}
-\end{align*}
-
-Let this PMF be named $p_{N_1}(k)$
-
