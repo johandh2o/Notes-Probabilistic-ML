@@ -3,3 +3,26 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
+
+The \red{multivariate normal distribution (MVN)} is the most widely used joint probability distribution for continuous variables. This follows from the \red{Central limit theorem} and the \red{Maximum entropy theorem}. The first one establishes that, in some situations, when independent random variables are added, their properly normalized sum tends toward a normal distribution. The second one establishes that, among continuous distributions with specified mean and covariance, the normal distribution has maximum entropy. This implies that the first two moments are usually all that we need to estimate from data, making as few additional assumptions as possible.
+
+%------------- SUBSECTION ---------------------------------
+\subsection{MLE for MVN}
+Let $X_i$ be a random variable with $\supp{X_i}\in\R^d$, and $X_i\dist{iid}\text{Nor}(\mu,\Sigma)$, with $\mu\in\R^d$, $\Sigma\in\R^{d\times d}$, $\Sigma\succeq 0$, then it has PDF:
+\begin{equation*}
+    \phi(x) = \frac{1}{(2\pi)^{d/2}\abs{\Sigma}^{1/2}}\exp[-\frac{1}{2}\tp{(x-\mu)}\inv{\Sigma}(x-\mu) ]
+\end{equation*}
+
+With a random sample of size $n$, its moments can be estimated by MLE:
+\begin{align*}
+    \hat{\mu} &= \frac{1}{N}\sum_{i=1}^nx_i = \bar{x}\\
+    \hat{\Sigma} &= \frac{1}{N}\sum_{i=1}^n (x_i-\hat{\mu})\tp{(x_i-\hat{\mu})} = \frac{1}{N}\sum_{i=1}^n x_i\tp{x_i}-\hat{\mu}\tp{\hat{\mu}}
+\end{align*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%------------- SECTION ---------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Quadratic Discriminant Analysis (QDA)}
+
+One important application of MVNs is to define the the class conditional densities in a generative classifier of the form $X_i|(Y_i=c_k)\dist{iid}\text{Nor}(\mu_k,\Sigma_k)$. This model reduces to the Naïve Bayes model when $\Sigma_k$ is diagonal for every class $k$.

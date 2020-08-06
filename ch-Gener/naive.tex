@@ -136,7 +136,7 @@ The maximization process is separable, so we get $\hat{\delta}_{k}=n_k/n$, and t
 \end{equation*}
 
 \subsubsection*{Beta-Binomial naïve Bayes}
-If all features are Bernoulli random variables, $X_{i,j}|(Y_i=c_k)\overset{iid}{\sim}\text{Ber}(\theta_{j,k})$, MLE estimator are:
+If all features are Bernoulli random variables, $X_{i,j}|(Y_i=c_k)\dist{iid}\text{Ber}(\theta_{j,k})$, MLE estimator are:
 \begin{equation*}
     \hat{\theta}_{j,k} = \frac{n_{j,k}}{n_k},\ \text{ where } n_{j,k}=\sum_{i=1}^n\I(y_i=c_k)x_{i,j}
 \end{equation*}
@@ -158,7 +158,7 @@ If $\theta$ follows a \red{Beta distribution}, $\theta_{j,k}{\sim}\text{Bet}(\be
 \subsubsection*{Dirichlet-Multinomial naïve Bayes}
 Beta-Bernoulli naïve Bayes does not work particularly well for document classification, because it does not count the number of times each word appears in each document. It neither takes into account the \textit{burstiness}: the phenomenon that most words never appear in any given document, but if they do appear once, they are likely to appear more than once. Thus, Dirichlet-Multinomial naïve Bayes can help better.
 
-If all features are \red{Dirichlet-Multinomial} random variables, $X_{i,j}|(Y_i=c_k)\overset{iid}{\sim}\text{Mul}(\theta_{j,k},n_k)$, and we as prior distributions $\delta\sim\text{Dir}(\alpha)$ and $\theta_k\sim\text{Dir}(\beta_1,\beta_2,\cdots,\beta_d)$. Then MAP estimators are $\Tilde{\delta}_k = (n_k+\alpha_k)/(n+\sum_{c=1}^K\alpha_c)$ and:
+If all features are \red{Dirichlet-Multinomial} random variables, $X_{i,j}|(Y_i=c_k)\dist{iid}\text{Mul}(\theta_{j,k},n_k)$, and we as prior distributions $\delta\sim\text{Dir}(\alpha)$ and $\theta_k\sim\text{Dir}(\beta_1,\beta_2,\cdots,\beta_d)$. Then MAP estimators are $\Tilde{\delta}_k = (n_k+\alpha_k)/(n+\sum_{c=1}^K\alpha_c)$ and:
 \begin{equation*}
     \Tilde{\theta} = \argsup_{\theta\in\Theta}  \sum_{i=1}^n\sum_{k=1}^K\I(y_i=c_k)\sum_{j=1}^d(n_{j,k}+\beta_j-1)\ln \theta_{j,k} \Longrightarrow \hat{\theta}_{j,k} = \frac{n_{j,k}-1+\beta_j}{n_k-d+\sum_{e=1}^d\beta_e}
 \end{equation*}
@@ -177,7 +177,7 @@ Using the MAP plug-in approximation we have that the estimated probability of ob
 
 Then, the best prediction of $Y$ given $X=x$ and given the data $\mathfrak{D}$ is:
 \begin{equation*}
-    \hat{y} = c_{\kappa},\ \kappa \in \argmax_{\kappa\in [K]} \Tilde{\delta}_k\prod_{j=1}^d \Tilde{\theta}_{j,k}^{x_j} 
+    \hat{y} = c_{\kappa},\ \kappa \in \argmax_{\kappa\in \{1,\dots,K\}} \Tilde{\delta}_k\prod_{j=1}^d \Tilde{\theta}_{j,k}^{x_j} 
 \end{equation*}
 
 \subsubsection*{Full Bayesian approach for Dirichlet-Multinomial naïve Bayes}
@@ -216,5 +216,5 @@ Then the \red{marginal posterior distribution} of component $j$ of $\text{Dir}(\
 
 The best prediction of $Y$ given $X=x$ and given the data $\mathfrak{D}$ is:
 \begin{equation*}
-    \hat{y} = c_{\kappa},\ \kappa \in \argmax_{\kappa\in [K]} \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E [\theta_{j,k}|\mathfrak{D},\beta]^{x_j}
+    \hat{y} = c_{\kappa},\ \kappa \in \argmax_{\kappa\in \{1,\dots,K\}} \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E [\theta_{j,k}|\mathfrak{D},\beta]^{x_j}
 \end{equation*}

@@ -170,7 +170,7 @@ frametitleaboveskip=\dimexpr-\ht\strutbox\relax
 % Notation
 \newcommand{\tp}[1]{{#1}^\top}
 \newcommand{\inv}[1]{{#1}^{-1}}
-\newcommand{\isim}{\overset{\textrm{iid}}^{\sim}}
+\newcommand{\dist}[1]{\mathbin{\overset{#1}{\kern\z@\sim}}}
 \DeclareMathOperator{\pr}{\mathbb{P}}
 \DeclareMathOperator{\N}{\mathbb{N}}
 \DeclareMathOperator{\R}{\mathbb{R}}
