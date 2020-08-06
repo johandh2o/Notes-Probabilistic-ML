@@ -25,12 +25,14 @@ With a random sample of size $n$, its moments can be estimated by MLE:
 
 \section{Discriminant Analysis}
 
+%------------- SUBSECTION ---------------------------------
+\subsection{Quadratic Discriminat Analysis (QDA)}
 One important application of MVNs is to define the class conditional densities in a generative classifier such that $X_i|(Y_i=C_k)\dist{iid}\text{Nor}(\mu_k,\Sigma_k)$\footnote{This model reduces to the Naïve Bayes model when $\Sigma_k$ is diagonal for every class $k$}. Under these assumptions, the predictive posterior probability of $Y=C_k,\ k\in\{1,...,K\}$ given $X=x\in\R^d$ would be:
 \begin{equation*}
     p(C_k|x,\mu,\Sigma,\delta) = \frac{p(C_k|\delta_k)f(x|C_k,\mu_k,\Sigma_k)}{\sum_{c=1}^K p(C_c|\delta_c)f(x|C_c,\mu_c,\Sigma_c)} = \frac{\delta_k\abs{\Sigma_k}^{-1/2} \exp[\frac{-1}{2}\tp{(x-\mu_k)}\inv{\Sigma_k}(x-\mu_k)]}{\sum_{c=1}^K \delta_c\abs{\Sigma_c}^{-1/2} \exp[\frac{-1}{2}\tp{(x-\mu_c)}\inv{\Sigma_c}(x-\mu_c)]}
 \end{equation*}
 
-It is to notice that $\ln p(C_k|x,\mu,\Sigma,\delta)$ is a quadratic function of $x$ for fixed values of the parameters: the decision boundaries look like quadratic functions in 2D. For this, the model is called \red{Quadratic Discriminant Analysis (QDA)}.
+It is to notice that $\ln p(C_k|x,\mu,\Sigma,\delta)$ is a quadratic function of $x$ for fixed values of the parameters: the decision boundaries between two different classes look like quadratic functions in 2D. For this, the model is called \red{Quadratic Discriminant Analysis (QDA)}.
 
 Class prediction is achieved by:
 \begin{equation*}
@@ -38,3 +40,33 @@ Class prediction is achieved by:
 \end{equation*}
 
 This can be thought of as a \red{nearest centroids classifier} using the \red{Mahalanobis distance}.
+
+Parameters can be estimated by MLE:
+\begin{equation*}
+    (\hat{\mu},\hat{\Sigma})_{k=1}^K\ \in \argmax_{\mu_k\in\R^d, \Sigma_k\in \R^{d\times d}, \Sigma_k\succeq 0} \sum_{i=1}^n\sum_{k=1}^K\I(y_i=C_k)\left[\ln\delta_k + \ln f(x_i|C_k, \mu_k, \Sigma_k)\right]
+\end{equation*}
+
+This optimization process is separable, and it ends up in the following MLE estimators:
+\begin{align*}
+    \hat{\delta}_k &= n_k/n\\
+    \hat{\mu}_k &= \dfrac{1}{n_k}\sum_{i=1}^n \I(y_i=C_k)x_i\\
+    \hat{\Sigma}_k &= \dfrac{1}{n_k}\sum_{i=1}^n \I(y_i=C_k) (x_i-\hat{\mu}_k)\tp{(x_i-\hat{\mu}_k)}
+\end{align*}
+
+
+%------------- SUBSECTION ---------------------------------
+\subsection{Linear Discriminat Analysis (LDA)}
+The number of parameters to estimate is $K(d^2+d+1)$, a quadratic function on the number of variables. When $d$ is large (and $n$ is comparatively small), the estimators can result having high errors, being ill-conditioned or impossible to calculate (singular matrix). As this can lead to overfitting, one way to avoid it is by modeling a \red{shared/tied covariance structure} $\Sigma_k=\Sigma,\ \forall k\in\{1,...,K\}$
+
+The predictive posterior probability of $Y=C_k,\ k\in\{1,...,K\}$ given $X=x\in\R^d$ would be:
+\begin{align*}
+    p(C_k|x,\mu,\Sigma,\delta) &= \frac{\delta_k \exp[\frac{-1}{2}\tp{(x-\mu_k)}\inv{\Sigma}(x-\mu_k)]}{\sum_{c=1}^K \delta_c \exp[\frac{-1}{2}\tp{(x-\mu_c)}\inv{\Sigma}(x-\mu_c)]} = \frac{\exp[\tp{(\inv{\Sigma}\mu_k)}x-\frac{1}{2}\tp{\mu}_k\Sigma\mu_k+\ln\delta_k]}{\sum_{c=1}^K\exp[\tp{(\inv{\Sigma}\mu_c)}x-\frac{1}{2}\tp{\mu}_c\Sigma\mu_c+\ln\delta_c]}\\
+    &= \text{SMX}_k(\tp{\beta}_1 x+\gamma_1,..., \tp{\beta}_K x+\gamma_K)
+\end{align*}
+
+Where $\text{SMX}_k$ is the \red{softmax function} on component $k$, and $\beta_k=\inv{\Sigma}\mu_k$, $\gamma_k = -\frac{1}{2}\tp{\mu}_k\Sigma\mu_k+\ln\delta_k$
+
+It is to notice that $\ln p(C_k|x,\mu,\Sigma,\delta)$ is a linear function of $x$ for fixed values of the parameters: the decision boundaries between two different classes look like straight lines in 2D. For this, the model is called \red{Linear Discriminant Analysis (LDA)} or \red{Latent Dirichlet allocation (LDA)}. Equating the probabilities of two different classes allows to find the linear boundary between them:
+\begin{equation*}
+    p(C_k|x,\mu,\Sigma,\delta)  = p(C_c|x,\mu,\Sigma,\delta) \Rightarrow \tp{(\beta_k-\beta_c)}x = \gamma_k-\gamma_c
+\end{equation*}
