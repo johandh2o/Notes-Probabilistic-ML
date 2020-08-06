@@ -7,7 +7,7 @@
 A \red{generative approach} models the conditional probability function (PF) $f(x|y,{\theta})$ of an observation $x$ from the $d$-dimensional vector of \red{features} $X$, given an observation of the \red{class label} $Y=y$; and then applies \red{Bayes rule} to give a classification. 
 
 $Y$ can be modeled as a discrete random variable that follows a 
-\red{categorical distribution} with $K$ distinct classes; this is $ \mathcal{Y}=\supp{Y}=\{c_1,c_2,...,c_K\}$. It has parameter $\delta\in\Delta$ (the simplex of size $K-1$), such that $\pr(Y=c_k)=p(c_k|\delta)=\delta_k$. Also, $X$ can be modeled as a $d$-dimensional random vector with $\mathcal{X}=\supp X$ and conditional PF $f(x|c_k,{\theta}_k)$ given $Y=c_k$, with parameter $\theta\in\Theta$
+\red{categorical distribution} with $K$ distinct classes; this is $ \mathcal{Y}=\supp{Y}=\{C_1,C_2,...,C_K\}$. It has parameter $\delta\in\Delta$ (the simplex of size $K-1$), such that $\pr(Y=C_k)=p(C_k|\delta)=\delta_k$. Also, $X$ can be modeled as a $d$-dimensional random vector with $\mathcal{X}=\supp X$ and conditional PF $f(x|C_k,{\theta}_k)$ given $Y=C_k$, with parameter $\theta\in\Theta$
 
 Parameters $\delta$ and $\theta$ can be modelled as stochastic variables, with respective PDF being $q(\delta|\alpha)$ and $g(\theta|\beta$), with \red{hyperparameters} $\alpha\in A,\beta\in B$
 
@@ -27,7 +27,7 @@ Let $h:\mathcal{X}\mapsto\mathcal{Y}$ be a {learner}/{classifier}. Its \red{cond
 
 If $\theta$ and $\delta$ were \textbf{deterministic and known}, a \red{Bayes optimal classifier}, $h(x)^*_B$ could be found, as it would be one of possibly many having the lowest risk or, equivalently, the highest \red{predictive posterior probability}.
 \begin{align*}
-    h(x)^*_B &\in   \argmax_{y\,\in\mathcal{Y}}\pr(Y=y|X={x}) = \argmax_{y\,\in\mathcal{Y}} \frac{\pr(Y=y)f(x|y,\theta)}{\sum_{k=1}^K \pr(Y=c_k)f(x|c_k,\theta)} \\ &= \argmax_{y\,\in\mathcal{Y}} p(y|\delta)f(x|y,\theta)
+    h(x)^*_B &\in   \argmax_{y\,\in\mathcal{Y}}\pr(Y=y|X={x}) = \argmax_{y\,\in\mathcal{Y}} \frac{\pr(Y=y)f(x|y,\theta)}{\sum_{k=1}^K \pr(Y=C_k)f(x|C_k,\theta)} \\ &= \argmax_{y\,\in\mathcal{Y}} p(y|\delta)f(x|y,\theta)
 \end{align*}
 
 Because $\theta$ and $\delta$ are typically not known, they should be estimated first using a \red{random sample}.
@@ -56,14 +56,14 @@ A similar analysis can be made when $\theta$ and $\delta$ are \textbf{stochastic
 %------------- subsection
 \subsection{Maximum Likelihood}
 In case of $\theta$ and $\delta$ being modeled as \textbf{deterministic}, then by \red{Bayes rule} the full joint distribution can be expressed in terms of the conditional PF of $X$ given $Y$: $f(x|y,\theta)$, and the marginal PMF of $Y$: $p(y|\delta)$, such that: 
-$f(y,x|\theta,\delta) = f(x|y,\theta)p(y|\delta)$
+$f(y,x|\theta,\delta) = p(y|\delta)f(x|y,\theta)$
 
 Let $\mathfrak{D}=(y_i,x_i)_{i=1}^n=(\vb{y},\vb{X})$ be a \red{random sample}, then the \red{MLE} estimators of $\theta\in\Theta, \delta\in\Delta$ are:
 \begin{align*}
     (\hat{\theta},\hat{\delta}) = \argsup_{\theta\in\Theta, \delta\in\Delta}l(\theta,\delta) &= \argsup_{\theta\in\Theta, \delta\in\Delta} \ln\prod_{i=1}^n p(y_i|\delta)f(x_i|y_i,\theta) \\
     &= \argsup_{\theta\in\Theta, \delta\in\Delta} \left[\sum_{i=1}^n\ln p(y_i|\delta)+\sum_{i=1}^n\ln f(x_i|y_i,\theta)\right] \\
-    &= \argsup_{\theta\in\Theta, \delta\in\Delta} \left[\sum_{i=1}^n\sum_{k=1}^K \I(y_i=c_k)\ln\delta_k+\sum_{i=1}^n\ln f(x_{i}|y_i,\theta)\right]\\
-    &= \argsup_{\theta\in\Theta, \delta\in\Delta} \left[\sum_{k=1}^K n_k\ln\delta_k+\sum_{i=1}^n\ln f(x_{i}|y_i,\theta)\right],\ \text{ where } n_k=\#\{y_i : y_i=c_k\}
+    &= \argsup_{\theta\in\Theta, \delta\in\Delta} \left[\sum_{i=1}^n\sum_{k=1}^K \I(y_i=C_k)\ln\delta_k+\sum_{i=1}^n\ln f(x_{i}|y_i,\theta)\right]\\
+    &= \argsup_{\theta\in\Theta, \delta\in\Delta} \left[\sum_{k=1}^K n_k\ln\delta_k+\sum_{i=1}^n\ln f(x_{i}|y_i,\theta)\right],\ \text{ where } n_k=\#\{y_i : y_i=C_k\}
 \end{align*}
 
 The maximization process is separable, so we get $\hat{\delta}_{k}=n_k/n$. The solution for $\hat{\theta}$ depends on the distribution assumption of $X|Y$
@@ -101,7 +101,7 @@ MAP classifier is based on an approximation named the \red{plug-in approximation
 \subsection{Full Bayesian approach}
 MAP is an asymptotic approximation  of the \red{predictive posterior distribution}. 
 \begin{equation*}
-   p(c_k|x,\Tilde{\theta},\Tilde{\delta}) \longrightarrow \pr(Y=c_k|X=x,\mathfrak{D}) = \int_{\Delta}\int_{\Theta}p(c_k|x,\theta,\delta)g(\theta|\mathfrak{D},\beta)q(\delta|\mathfrak{D},\alpha)d\theta d\delta
+   p(C_k|x,\Tilde{\theta},\Tilde{\delta}) \longrightarrow \pr(Y=C_k|X=x,\mathfrak{D}) = \int_{\Delta}\int_{\Theta}p(C_k|x,\theta,\delta)g(\theta|\mathfrak{D},\beta)q(\delta|\mathfrak{D},\alpha)d\theta d\delta
 \end{equation*}
 
 Where $q(\delta|\mathfrak{D},\alpha)$ and $g(\theta|\mathfrak{D},\beta)$ are \red{posterior distributions}:
@@ -110,11 +110,11 @@ Where $q(\delta|\mathfrak{D},\alpha)$ and $g(\theta|\mathfrak{D},\beta)$ are \re
     g(\theta|\mathfrak{D},\beta)\ & \propto\  g(\theta|\beta)\prod_{i=1}^n f(x_i|y_i,\theta)
 \end{align*}
 
-However, in some cases $p(c_k|x,\Tilde{\theta},\Tilde{\delta}) $ may not approximate well the predictive posterior distribution, specially in small sample sizes. Also, MAP \textbf{is not invariant to reparametrization}, unline MLE. For this, a full Bayesian approach may be better:
+However, in some cases $p(C_k|x,\Tilde{\theta},\Tilde{\delta}) $ may not approximate well the predictive posterior distribution, specially in small sample sizes. Also, MAP \textbf{is not invariant to reparametrization}, unline MLE. For this, a full Bayesian approach may be better:
 \begin{align*}
-    \pr(Y=c_k|X=x,\mathfrak{D}) &=\int_{\Delta}\int_{\Theta}p(c_k|x,\theta,\delta)g(\theta|\mathfrak{D},\beta)q(\delta|\mathfrak{D},\alpha)d\theta d\delta \\
-    &\propto\ \int_{\Delta} p(c_k|\delta)q(\delta|\mathfrak{D},\alpha) d\delta\times \int_{\Theta}f(x|c_k,\theta) g(\theta|\mathfrak{D},\beta) d\theta\\
-    &\propto\ \E_{\delta}[p(c_k|\delta)|\mathfrak{D},\alpha]\times \E_{\theta}[f(x|c_k,\theta)|\mathfrak{D},\beta]
+    \pr(Y=C_k|X=x,\mathfrak{D}) &=\int_{\Delta}\int_{\Theta}p(C_k|x,\theta,\delta)g(\theta|\mathfrak{D},\beta)q(\delta|\mathfrak{D},\alpha)d\theta d\delta \\
+    &\propto\ \int_{\Delta} p(C_k|\delta)q(\delta|\mathfrak{D},\alpha) d\delta\times \int_{\Theta}f(x|C_k,\theta) g(\theta|\mathfrak{D},\beta) d\theta\\
+    &\propto\ \E_{\delta}[p(C_k|\delta)|\mathfrak{D},\alpha]\times \E_{\theta}[f(x|C_k,\theta)|\mathfrak{D},\beta]
 \end{align*}
 
 
@@ -125,20 +125,20 @@ However, in some cases $p(c_k|x,\Tilde{\theta},\Tilde{\delta}) $ may not approxi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Naïve Bayes}
-The naïve Bayes approach assumes that features are \red{conditionally independent} given the class label. This means that $f(x_i|y,\theta)=\prod_{j=1}^d\prod_{k=1}^K  f(x_{i,j}|y,\theta_{j,k})^{\I(y=c_k)}$
+The naïve Bayes approach assumes that features are \red{conditionally independent} given the class label. This means that $f(x_i|y,\theta)=\prod_{j=1}^d\prod_{k=1}^K  f(x_{i,j}|y,\theta_{j,k})^{\I(y=C_k)}$
 
 %------------- subsection
 \subsection{Estimation}
 
 The maximization process is separable, so we get $\hat{\delta}_{k}=n_k/n$, and the MLE estimators of $\theta$ can be found with:
 \begin{equation*}
-    \hat{\theta}  = \argsup_{\theta\in\Theta} \sum_{i=1}^n\ln\prod_{j=1}^d f(x_{i,j}|y_i,\theta) = \argsup_{\theta\in\Theta} \sum_{i=1}^n\sum_{k=1}^K\I(y_i=c_k)\sum_{j=1}^d\ln f(x_{i,j}|y_i,\theta_{j,k})
+    \hat{\theta}  = \argsup_{\theta\in\Theta} \sum_{i=1}^n\ln\prod_{j=1}^d f(x_{i,j}|y_i,\theta) = \argsup_{\theta\in\Theta} \sum_{i=1}^n\sum_{k=1}^K\I(y_i=C_k)\sum_{j=1}^d\ln f(x_{i,j}|y_i,\theta_{j,k})
 \end{equation*}
 
 \subsubsection*{Beta-Binomial naïve Bayes}
-If all features are Bernoulli random variables, $X_{i,j}|(Y_i=c_k)\dist{iid}\text{Ber}(\theta_{j,k})$, MLE estimator are:
+If all features are Bernoulli random variables, $X_{i,j}|(Y_i=C_k)\dist{iid}\text{Ber}(\theta_{j,k})$, MLE estimator are:
 \begin{equation*}
-    \hat{\theta}_{j,k} = \frac{n_{j,k}}{n_k},\ \text{ where } n_{j,k}=\sum_{i=1}^n\I(y_i=c_k)x_{i,j}
+    \hat{\theta}_{j,k} = \frac{n_{j,k}}{n_k},\ \text{ where } n_{j,k}=\sum_{i=1}^n\I(y_i=C_k)x_{i,j}
 \end{equation*}
 
 This model is known as \red{bag of words model}, where every $X_{i,j}$ represents the presence or absence of word $j$ in document $i$. It is used to classify documents. 
@@ -147,47 +147,47 @@ However, MLE can overfit, specially when $\hat{\theta}_{j,k}=1\ (\text{or } 0),\
 
 Let $\delta\sim\text{Dir}(\alpha)$ and $\theta$ have some distribution with PDF $g(\theta|\beta)$. Then MAP estimators are $\Tilde{\delta}_k = (n_k+\alpha_k)/(n+\sum_{c=1}^K\alpha_c)$ and:
 \begin{equation*}
-    \Tilde{\theta} = \argsup_{\theta\in\Theta} \left[\ln g(\theta|\beta)+ \sum_{i=1}^n\sum_{k=1}^K\I(y_i=c_k)\sum_{j=1}^d\ln f(x_{i,j}|y_i,\theta_{j,k})\right]
+    \Tilde{\theta} = \argsup_{\theta\in\Theta} \left[\ln g(\theta|\beta)+ \sum_{i=1}^n\sum_{k=1}^K\I(y_i=C_k)\sum_{j=1}^d\ln f(x_{i,j}|y_i,\theta_{j,k})\right]
 \end{equation*}
 
 If $\theta$ follows a \red{Beta distribution}, $\theta_{j,k}{\sim}\text{Bet}(\beta_1,\beta_2),\ \beta_{1,2}>0$, MAP estimator are:
 \begin{equation*}
-    \hat{\theta}_{j,k} = \frac{n_{j,k}-1+\beta_1}{n_k-2+\beta_1+\beta_2},\ \text{ where } n_{j,k}=\sum_{i=1}^n\I(y_i=c_k)x_{i,j}
+    \hat{\theta}_{j,k} = \frac{n_{j,k}-1+\beta_1}{n_k-2+\beta_1+\beta_2},\ \text{ where } n_{j,k}=\sum_{i=1}^n\I(y_i=C_k)x_{i,j}
 \end{equation*}
 
 \subsubsection*{Dirichlet-Multinomial naïve Bayes}
 Beta-Bernoulli naïve Bayes does not work particularly well for document classification, because it does not count the number of times each word appears in each document. It neither takes into account the \textit{burstiness}: the phenomenon that most words never appear in any given document, but if they do appear once, they are likely to appear more than once. Thus, Dirichlet-Multinomial naïve Bayes can help better.
 
-If all features are \red{Dirichlet-Multinomial} random variables, $X_{i,j}|(Y_i=c_k)\dist{iid}\text{Mul}(\theta_{j,k},n_k)$, and we as prior distributions $\delta\sim\text{Dir}(\alpha)$ and $\theta_k\sim\text{Dir}(\beta_1,\beta_2,\cdots,\beta_d)$. Then MAP estimators are $\Tilde{\delta}_k = (n_k+\alpha_k)/(n+\sum_{c=1}^K\alpha_c)$ and:
+If all features are \red{Dirichlet-Multinomial} random variables, $X_{i,j}|(Y_i=C_k)\dist{iid}\text{Mul}(\theta_{j,k},n_k)$, and we as prior distributions $\delta\sim\text{Dir}(\alpha)$ and $\theta_k\sim\text{Dir}(\beta_1,\beta_2,\cdots,\beta_d)$. Then MAP estimators are $\Tilde{\delta}_k = (n_k+\alpha_k)/(n+\sum_{c=1}^K\alpha_c)$ and:
 \begin{equation*}
-    \Tilde{\theta} = \argsup_{\theta\in\Theta}  \sum_{i=1}^n\sum_{k=1}^K\I(y_i=c_k)\sum_{j=1}^d(n_{j,k}+\beta_j-1)\ln \theta_{j,k} \Longrightarrow \hat{\theta}_{j,k} = \frac{n_{j,k}-1+\beta_j}{n_k-d+\sum_{e=1}^d\beta_e}
+    \Tilde{\theta} = \argsup_{\theta\in\Theta}  \sum_{i=1}^n\sum_{k=1}^K\I(y_i=C_k)\sum_{j=1}^d(n_{j,k}+\beta_j-1)\ln \theta_{j,k} \Longrightarrow \hat{\theta}_{j,k} = \frac{n_{j,k}-1+\beta_j}{n_k-d+\sum_{e=1}^d\beta_e}
 \end{equation*}
 \begin{equation*}
-    \text{Where } n_{j,k}=\sum_{i=1}^n\I(y_i=c_k)x_{i,j}
+    \text{Where } n_{j,k}=\sum_{i=1}^n\I(y_i=C_k)x_{i,j}
 \end{equation*}
 
 %------------- subsection
 \subsection{Prediction}
 
 \subsubsection*{MAP plug-in approximation for Dirichlet-Multinomial naïve Bayes}
-Using the MAP plug-in approximation we have that the estimated probability of observing $Y=c_k$ given that $X=x$ is:
+Using the MAP plug-in approximation we have that the estimated probability of observing $Y=C_k$ given that $X=x$ is:
 \begin{equation*}
-    p(c_k|x, \Tilde{\theta},\Tilde{\delta})\, \propto\ p(c_k|\Tilde{\delta})f(x|c_k,\Tilde{\theta})\, \propto\  \Tilde{\delta}_k\prod_{j=1}^d \Tilde{\theta}_{j,k}^{x_j} 
+    p(C_k|x, \Tilde{\theta},\Tilde{\delta})\, \propto\ p(C_k|\Tilde{\delta})f(x|C_k,\Tilde{\theta})\, \propto\  \Tilde{\delta}_k\prod_{j=1}^d \Tilde{\theta}_{j,k}^{x_j} 
 \end{equation*}
 
 Then, the best prediction of $Y$ given $X=x$ and given the data $\mathfrak{D}$ is:
 \begin{equation*}
-    \hat{y} = c_{\kappa},\ \kappa \in \argmax_{\kappa\in \{1,\dots,K\}} \Tilde{\delta}_k\prod_{j=1}^d \Tilde{\theta}_{j,k}^{x_j} 
+    \hat{y}(x) = C_{\varkappa},\ \varkappa \in \argmax_{k\in \{1,\dots,K\}} \left[ \ln \Tilde{\delta}_k+\sum_{j=1}^d x_j\ln \Tilde{\theta}_{j,k} \right]
 \end{equation*}
 
 \subsubsection*{Full Bayesian approach for Dirichlet-Multinomial naïve Bayes}
 
 Using the full Bayesian approach we have that:
 \begin{align*}
-    \pr(Y=c_k|X =x,\mathfrak{D})\
-    &\propto\ \E_{\delta}[p(c_k|\delta)|\mathfrak{D},\alpha]\times \E_{\theta}[f(x|c_k,\theta)|\mathfrak{D},\beta] \\
-    &\propto\ \E [\delta_k|\mathfrak{D},\alpha] \times \E_{\theta}\left[\prod_{j=1}^d  f(x_j|c_k,\theta_{j,k}) \Big|\mathfrak{D},\beta\right]\\
-    &\propto\ \E [\delta_k|\mathfrak{D},\alpha] \times \prod_{j=1}^d\E_{\theta}\left[  f(x_j|c_k,\theta_{j,k}) \Big|\mathfrak{D},\beta\right]\ \text{ by independence of features} \\
+    \pr(Y=C_k|X =x,\mathfrak{D})\
+    &\propto\ \E_{\delta}[p(C_k|\delta)|\mathfrak{D},\alpha]\times \E_{\theta}[f(x|C_k,\theta)|\mathfrak{D},\beta] \\
+    &\propto\ \E [\delta_k|\mathfrak{D},\alpha] \times \E_{\theta}\left[\prod_{j=1}^d  f(x_j|C_k,\theta_{j,k}) \Big|\mathfrak{D},\beta\right]\\
+    &\propto\ \E [\delta_k|\mathfrak{D},\alpha] \times \prod_{j=1}^d\E_{\theta}\left[  f(x_j|C_k,\theta_{j,k}) \Big|\mathfrak{D},\beta\right]\ \text{ by independence of features} \\
     &\propto\ \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E \left[\prod_{b=1}^{x_j}\theta_{j,k}|\mathfrak{D},\beta\right]\ \text{ by Bernoulli trials decomposition}\\
     &\propto\ \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E [\theta_{j,k}|\mathfrak{D},\beta]^{x_j}\ \text{ by independence of Bernoulli trials}
 \end{align*}
@@ -206,7 +206,7 @@ Then the \red{marginal posterior distribution} of component $k$ of $\text{Dir}(\
 
 In the case of the posterior distribution of $\theta_k$ we have:
 \begin{equation*}
-    g(\theta_k|\mathfrak{D},\beta)\  \propto\  g(\theta_k|\beta)\prod_{i=1}^n f(x_i|y_i,\theta)^{\I(y_i=c_k)}\ \propto\ \prod_{j=1}^d \theta_{j,k}^{\beta_j-1+n_{j,k}}\Rightarrow \text{Dir}(\beta_1+n_{1,k},\cdots,\beta_d+n_{d,k})
+    g(\theta_k|\mathfrak{D},\beta)\  \propto\  g(\theta_k|\beta)\prod_{i=1}^n f(x_i|y_i,\theta)^{\I(y_i=C_k)}\ \propto\ \prod_{j=1}^d \theta_{j,k}^{\beta_j-1+n_{j,k}}\Rightarrow \text{Dir}(\beta_1+n_{1,k},\cdots,\beta_d+n_{d,k})
 \end{equation*}
 
 Then the \red{marginal posterior distribution} of component $j$ of $\text{Dir}(\beta_1+n_{1,k},\cdots,\beta_d+n_{d,k})$ is $\text{Bet}(n_{j,k}+\beta_j, n_k-n_{j,k}+\sum_{e=1}^d\beta_e-\beta_j)$, which means:
@@ -216,5 +216,5 @@ Then the \red{marginal posterior distribution} of component $j$ of $\text{Dir}(\
 
 The best prediction of $Y$ given $X=x$ and given the data $\mathfrak{D}$ is:
 \begin{equation*}
-    \hat{y} = c_{\kappa},\ \kappa \in \argmax_{\kappa\in \{1,\dots,K\}} \E [\delta_k|\mathfrak{D},\alpha]\times\prod_{j=1}^d \E [\theta_{j,k}|\mathfrak{D},\beta]^{x_j}
+    \hat{y}(x) = C_{\varkappa},\ \varkappa \in \argmax_{k\in \{1,\dots,K\}} \left[ \ln\E [\delta_k|\mathfrak{D},\alpha]+\sum_{j=1}^d x_j\ln \E [\theta_{j,k}|\mathfrak{D},\beta] \right]
 \end{equation*}

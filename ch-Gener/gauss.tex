@@ -10,7 +10,7 @@ The \red{multivariate normal distribution (MVN)} is the most widely used joint p
 \subsection{MLE for MVN}
 Let $X_i$ be a random variable with $\supp{X_i}\in\R^d$, and $X_i\dist{iid}\text{Nor}(\mu,\Sigma)$, with $\mu\in\R^d$, $\Sigma\in\R^{d\times d}$, $\Sigma\succeq 0$, then it has PDF:
 \begin{equation*}
-    \phi(x) = \frac{1}{(2\pi)^{d/2}\abs{\Sigma}^{1/2}}\exp[-\frac{1}{2}\tp{(x-\mu)}\inv{\Sigma}(x-\mu) ]
+    f(x|\mu,\Sigma) = \frac{1}{(2\pi)^{d/2}\abs{\Sigma}^{1/2}}\exp[-\frac{1}{2}\tp{(x-\mu)}\inv{\Sigma}(x-\mu) ]
 \end{equation*}
 
 With a random sample of size $n$, its moments can be estimated by MLE:
@@ -23,6 +23,18 @@ With a random sample of size $n$, its moments can be estimated by MLE:
 %------------- SECTION ---------------------------------
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Quadratic Discriminant Analysis (QDA)}
+\section{Discriminant Analysis}
 
-One important application of MVNs is to define the the class conditional densities in a generative classifier of the form $X_i|(Y_i=c_k)\dist{iid}\text{Nor}(\mu_k,\Sigma_k)$. This model reduces to the Naïve Bayes model when $\Sigma_k$ is diagonal for every class $k$.
+One important application of MVNs is to define the class conditional densities in a generative classifier such that $X_i|(Y_i=C_k)\dist{iid}\text{Nor}(\mu_k,\Sigma_k)$\footnote{This model reduces to the Naïve Bayes model when $\Sigma_k$ is diagonal for every class $k$}. Under these assumptions, the predictive posterior probability of $Y=C_k,\ k\in\{1,...,K\}$ given $X=x\in\R^d$ would be:
+\begin{equation*}
+    p(C_k|x,\mu,\Sigma,\delta) = \frac{p(C_k|\delta_k)f(x|C_k,\mu_k,\Sigma_k)}{\sum_{c=1}^K p(C_c|\delta_c)f(x|C_c,\mu_c,\Sigma_c)} = \frac{\delta_k\abs{\Sigma_k}^{-1/2} \exp[\frac{-1}{2}\tp{(x-\mu_k)}\inv{\Sigma_k}(x-\mu_k)]}{\sum_{c=1}^K \delta_c\abs{\Sigma_c}^{-1/2} \exp[\frac{-1}{2}\tp{(x-\mu_c)}\inv{\Sigma_c}(x-\mu_c)]}
+\end{equation*}
+
+It is to notice that $\ln p(C_k|x,\mu,\Sigma,\delta)$ is a quadratic function of $x$ for fixed values of the parameters: the decision boundaries look like quadratic functions in 2D. For this, the model is called \red{Quadratic Discriminant Analysis (QDA)}.
+
+Class prediction is achieved by:
+\begin{equation*}
+    \hat{y}(x) = C_{\varkappa},\ \varkappa \in \argmax_{k\in \{1,\dots,K\}} p(C_k|x,\mu,\Sigma,\delta) = \argmax_{k\in \{1,\dots,K\}} \delta_k\abs{\Sigma_k}^{-1/2} \exp[\frac{-1}{2}\tp{(x-\mu_k)}\inv{\Sigma_k}(x-\mu_k)]
+\end{equation*}
+
+This can be thought of as a \red{nearest centroids classifier} using the \red{Mahalanobis distance}.
